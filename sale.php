@@ -268,14 +268,14 @@ $mnu = 'menu_sale';
             <td>&nbsp;</td>
           </tr>
           <tr>
-            <td colspan='2'>SIMPLE PNG LIMITED</td>
+            <td colspan='2'>SIMPLE POS</td>
           </tr>
           <tr>
-            <td colspan='2'>Speybank, Lae City, PNG</td>
+            <td colspan='2'>Lae City, PNG</td>
           </tr>
           <tr>
             <td align='left'>TIN #:</td>
-            <td align='right' id='sale_receipt_tin'>500004915</td>
+            <td align='right' id='sale_receipt_tin'>000000000</td>
           </tr>
           <tr>
             <td align='left'>Receipt #:</td>
