@@ -184,6 +184,7 @@ $mnu = 'menu_product';
                                   <th>Product Name</th>
                                   <th>Stock</th>
                                   <th>UOM</th>
+                                  <th>CATEGORY</th>
                                   <!--
                                     <th>Selling Price</th>
                                     -->
@@ -670,6 +671,7 @@ $mnu = 'menu_product';
       var search_code = $("#txt_product_code_asearch").val();
       var search_name = $("#txt_product_name_asearch").val();
       var search_uom = $("#txt_product_uom_asearch").val();
+      var search_category = $("#txt_product_category_asearch").val();
       var search_price = $("#txt_product_price_asearch").val();
       var search_status = $("#txt_product_status_asearch").val();
 
@@ -681,6 +683,7 @@ $mnu = 'menu_product';
         product_code: search_code,
         product_name: search_name,
         product_uom: search_uom,
+        product_category: search_category,
         product_price: search_price,
         product_status: search_status
       }, function(data) {
@@ -1761,9 +1764,10 @@ $mnu = 'menu_product';
       var product_code = $("#txt_product_code_update").val();
       var product_name = $("#txt_product_name_update").val();
       var product_uom = $("#txt_product_uom_update").val();
+      var product_category = $("#txt_product_category_update").val();
 
       if (id) {
-        if (product_code && product_name && product_uom) {
+        if (product_code && product_name && product_uom && product_category) {
 
           $(".buttons_show, .error_show, .modal-body").css("display", "none");
           $(".progress_show").css("display", "block");
@@ -1773,7 +1777,8 @@ $mnu = 'menu_product';
             id: id,
             product_code: product_code,
             product_name: product_name,
-            product_uom: product_uom
+            product_uom: product_uom,
+            product_category: product_category
           }, function(data) {
             $(".buttons_show, .modal-body").css("display", "block");
             $(".progress_show, .error_show").css("display", "none");
@@ -1838,11 +1843,13 @@ $mnu = 'menu_product';
             var product_code = data.split(":|:")[0];
             var product_name = data.split(":|:")[1];
             var product_uom = data.split(":|:")[2];
+            var product_category = data.split(":|:")[3];
 
             $(".hidden_product_id").val(id);
             $("#txt_product_code_update").val(product_code);
             $("#txt_product_name_update").val(product_name);
             $("#txt_product_uom_update").val(product_uom);
+            $("#txt_product_category_update").val(product_category);
 
             $(".buttons_show, .modal-body").css("display", "block");
             $(".progress_show, .error_show").css("display", "none");
@@ -1863,8 +1870,9 @@ $mnu = 'menu_product';
       var product_code = $("#txt_product_code").val();
       var product_name = $("#txt_product_name").val();
       var product_uom = $("#txt_product_uom").val();
+      var product_category = $("#txt_product_category").val();
 
-      if (product_code && product_name && product_uom) {
+      if (product_code && product_name && product_uom && product_category) {
 
         $(".buttons_show, .error_show, .modal-body").css("display", "none");
         $(".progress_show").css("display", "block");
@@ -1873,7 +1881,8 @@ $mnu = 'menu_product';
           action: 2,
           product_code: product_code,
           product_name: product_name,
-          product_uom: product_uom
+          product_uom: product_uom,
+          product_category: product_category
         }, function(data) {
           $(".buttons_show, .modal-body").css("display", "block");
           $(".progress_show, .error_show").css("display", "none");
