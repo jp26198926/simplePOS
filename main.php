@@ -1,5 +1,6 @@
 <?php
 include('validate.php');
+include('config.php');
 $mnu = "menu_main";
 ?>
 
@@ -7,7 +8,7 @@ $mnu = "menu_main";
 <html>
 
 <head>
-  <title>Simple POS</title>
+  <title><?= $app_name; ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -268,17 +269,19 @@ $mnu = "menu_main";
 
       if ($('.ct-chart-sale').length) {
         new Chartist.Line('.ct-chart-sale', {
-          //labels: ["06:00","07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"],
-          //series: [[0, 6000, 4210, 8010, 19158, 35326, 80837, 79477, 88561, 67807, 70837, 55261, 66216, 10516, 13493]],
-          labels: label_array,
-          series: [total_array]
+          labels: ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"],
+          series: [
+            [0, 60, 42, 80, 19, 35, 80, 79, 88, 67, 70, 55, 66, 505, 13]
+          ],
+          // labels: label_array,
+          // series: [total_array]
         }, {
           axisX: {
             position: 'center'
           },
           axisY: {
-            offset: 0,
-            showLabel: false,
+            //offset: 0,
+            showLabel: true,
             labelInterpolationFnc: function labelInterpolationFnc(value) {
               return value; // / 1000 + 'k';
             }
@@ -287,7 +290,7 @@ $mnu = "menu_main";
             top: 0,
             right: 0,
             bottom: 0,
-            left: 0
+            //left: 30
           },
           //height: 250,
           //high: 120000,
@@ -296,9 +299,9 @@ $mnu = "menu_main";
           showArea: true,
           stackBars: true,
           fullWidth: true,
-          lineSmooth: false,
+          lineSmooth: true,
           plugins: [Chartist.plugins.ctPointLabels({
-            textAnchor: 'left',
+            textAnchor: 'center',
             labelInterpolationFnc: function labelInterpolationFnc(value) {
               return 'K ' + parseInt(value); // / 1000) + 'k';
             }
@@ -307,7 +310,7 @@ $mnu = "menu_main";
           ['screen and (max-width: 768px)', {
             axisX: {
               offset: 0,
-              showLabel: false
+              showLabel: true
             },
             height: 180
           }]

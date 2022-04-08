@@ -2,6 +2,7 @@
     
 // Include the main    
     include("validate.php");
+	include("config.php");
     
     if (!empty($_SESSION['inventory_sql']) || $_SESSION['inventory_sql']!=''){
         $sql = $_SESSION['inventory_sql'];
@@ -133,21 +134,34 @@ require_once dirname(__FILE__) . '/library/tcpdf/tcpdf.php';
 
 // Extend the TCPDF class to create custom Header and Footer
 class MYPDF extends TCPDF {
+	
+	public $logo_path="";
+	public $company="";
+	public $address="";
+	public $page_name="";
+	public $signatory="";
 
     //Page header
     public function Header() {
         // Logo
-        $image_file = 'images/png80.png';
-        $this->Image($image_file, 15,4, 14,'', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        //$image_file = 'images/png80.png';
+		if ($this->logo_path){ //if value has been supplied then 
+			$image_file = $this->logo_path;
+			$this->Image($image_file, 15,4, 14,'', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+		}		
+		
         // Set font        
-        $this->SetFont('helvetica', 'R', 12);       
-        $this->MultiCell(50,10,"Frabelle PNG Ltd.",0,'L',false,0,30,6,false,0,false,true,0,'T',false);
+        $this->SetFont('helvetica', 'R', 12);  
+		$this->MultiCell(100,10,$this->company,0,'L',false,0,30,6,false,0,false,true,0,'T',false);
+        //$this->MultiCell(50,10,"Frabelle PNG Ltd.",0,'L',false,0,30,6,false,0,false,true,0,'T',false);
         
-        $this->SetFont('helvetica', 'R', 8);       
-        $this->MultiCell(50,10,"Lae City, Papua New Guinea",0,'L',false,0,30,7,false,0,false,true,0,'T',false);
+        $this->SetFont('helvetica', 'R', 8);     
+		$this->MultiCell(50,10,$this->address,0,'L',false,0,30,8,false,0,false,true,0,'T',false);
+        //$this->MultiCell(50,10,"Lae City, Papua New Guinea",0,'L',false,0,30,7,false,0,false,true,0,'T',false);
         
-        $this->SetFont('helvetica', 'B', 15);        
-        $this->Cell(0, 26, 'POS - INVENTORY',0,1,'R', 0, '', 0, false, 'M', 'B');        
+        $this->SetFont('helvetica', 'B', 15);   
+		$this->Cell(0, 26, $this->page_name,0,1,'R', 0, '', 0, false, 'M', 'B');    
+        //$this->Cell(0, 26, 'POS - PRODUCT SOLD',0,1,'R', 0, '', 0, false, 'M', 'B');        
         $this->writeHTML("<hr />",true,false,true,false,'');
     }
 
@@ -159,21 +173,26 @@ class MYPDF extends TCPDF {
         $this->SetFont('helvetica', 'I', 8);
         // Page number
         $signatory=$_SESSION['signatory'];
-        $this->writeHTML($signatory,true,true);
+        //$this->writeHTML($signatory,true,true);
+		$this->writeHTML($this->signatory,true,true);
         $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() , 0, false, 'C', 0, '', 0, false, 'T', 'M');
         
         $preparedby = $_SESSION['ufullname'];
-        //$rep = $_SESSION['rep'];
+        //$rep = $_SESSION['rep'];        
         
-        
-    }
-    
+    }    
     
 }
 
 // create new PDF document
 //$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
-$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'A4', true, 'UTF-8', false);
+
+$pdf->logo_path = $logo_path;
+$pdf->company = $company;
+$pdf->address = $address;
+$pdf->page_name="POS - INVENTORY";
+$pdf->signatory = $signatory;
 
 // set document information
 $pdf->SetCreator(PDF_CREATOR);

@@ -1,5 +1,7 @@
 <?php
 session_start();
+include('config.php');
+
 if (!empty($_SESSION['uid'])) {
 	$uid = $_SESSION['uid'];
 	$udept = $_SESSION['udept'];
@@ -12,7 +14,7 @@ if (!empty($_SESSION['uid'])) {
 <html>
 
 <head>
-	<title>Simple POS</title>
+	<title><?= $app_name; ?></title>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 

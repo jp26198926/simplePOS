@@ -1,5 +1,6 @@
 <?php
 include('validate.php');
+include('config.php');
 $mnu = 'menu_report';
 ?>
 
@@ -7,7 +8,7 @@ $mnu = 'menu_report';
 <html>
 
 <head>
-  <title>Simple POS</title>
+  <title><?= $app_name; ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="./assets/css/jquery-ui.min.css" rel="stylesheet">
@@ -423,14 +424,14 @@ $mnu = 'menu_report';
             <td>&nbsp;</td>
           </tr>
           <tr>
-            <td colspan='2'>SIMPLE PNG LIMITED</td>
+            <td colspan='2'><?= $app_name; ?></td>
           </tr>
           <tr>
-            <td colspan='2'>Speybank, Lae City, PNG</td>
+            <td colspan='2'><?= $address; ?></td>
           </tr>
           <tr>
             <td align='left'>TIN #:</td>
-            <td align='right' id='sale_receipt_tin'>500004915</td>
+            <td align='right' id='sale_receipt_tin'><?= $tin_no; ?></td>
           </tr>
           <tr>
             <td align='left'>Receipt #:</td>

@@ -68,8 +68,11 @@
                     <ul>
                       <li class='section'><i class='fa fa-user' aria-hidden='true'></i>Account</li>
                       <li><a href='./user.php'>User </a></li>
+
+                      <!--
                       <li><a href='./dept.php'>Department </a></li>
                       <li><a href='#'>Access Level </a></li>
+                      -->
                       
                       <li class='line'></li>
                       

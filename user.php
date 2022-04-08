@@ -1,5 +1,6 @@
 <?php
 include('validate.php');
+include('config.php');
 $mnu = 'menu_admin';
 ?>
 
@@ -7,7 +8,7 @@ $mnu = 'menu_admin';
 <html>
 
 <head>
-  <title>Simple POS</title>
+  <title><?= $app_name; ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 

@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.1
--- http://www.phpmyadmin.net
+-- version 5.0.4
+-- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Feb 21, 2021 at 04:29 AM
--- Server version: 10.1.9-MariaDB
--- PHP Version: 5.6.15
+-- Host: localhost:3308
+-- Generation Time: Mar 06, 2022 at 12:04 AM
+-- Server version: 5.7.24
+-- PHP Version: 7.2.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -41,6 +42,7 @@ INSERT INTO `pos_access` (`id`, `access_details`) VALUES
 (3, 'accounting'),
 (1, 'admin'),
 (4, 'audit'),
+(5, 'report only'),
 (2, 'user');
 
 -- --------------------------------------------------------
@@ -140,17 +142,7 @@ CREATE TABLE `pos_dept` (
 --
 
 INSERT INTO `pos_dept` (`id`, `dept_code`, `dept_name`, `added_by`, `dt_added`, `updated_by`, `dt_updated`, `status_id`) VALUES
-(1, 'MIG', 'Management Information Group', 0, '', 0, '', 1),
-(2, 'PUR', 'Purchasing', 0, '', 0, '', 1),
-(3, 'ADM', 'Administration', 0, '', 0, '', 1),
-(4, 'FIN', 'FINANCE', 0, '', 0, '', 1),
-(5, 'ACCT', 'ACCOUNTING', 0, '', 0, '', 1),
-(6, 'CLIN', 'CLINIC', 0, '', 0, '', 1),
-(7, 'AUD', 'AUDIT', 0, '', 0, '', 1),
-(8, 'HRD', 'Human Resource Department', 0, '', 0, '', 1),
-(9, 'CAS', 'CASHIER', 0, '', 0, '', 1),
-(10, 'PAY', 'PAYROLL', 0, '', 0, '', 1),
-(11, 'DEC', 'DECK', 1, '2016-03-27 09:17:43 AM', 0, '', 1);
+(12, 'ADM', 'Administration', 0, '', 0, '', 1);
 
 -- --------------------------------------------------------
 
@@ -180,20 +172,6 @@ CREATE TABLE `pos_module` (
   `status_id` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `pos_module`
---
-
-INSERT INTO `pos_module` (`id`, `module_name`, `added_by`, `dt_added`, `status_id`) VALUES
-(1, 'Transaction', 1, '2017-03-25 00:00:00', 1),
-(2, 'Product', 1, '2017-03-25 00:00:00', 1),
-(3, 'Receiving', 1, '2017-03-25 00:00:00', 1),
-(4, 'UOM', 1, '2017-03-25 00:00:00', 1),
-(5, 'Supplier', 1, '2017-03-25 00:00:00', 1),
-(6, 'Sold Item', 1, '2017-03-25 00:00:00', 1),
-(7, 'Buyer Type', 1, '2017-05-30 00:00:00', 1),
-(8, 'Pricing', 1, '2017-05-30 00:00:00', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -209,21 +187,6 @@ CREATE TABLE `pos_price` (
   `updated_by` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `pos_price`
---
-
-INSERT INTO `pos_price` (`id`, `buyer_id`, `product_id`, `price`, `dt_updated`, `updated_by`) VALUES
-(1, 1, 1, '1.00', '2020-11-10 16:21:23', 1),
-(2, 1, 2, '123.00', '2017-05-31 22:12:35', 1),
-(3, 2, 1, '14.00', '2020-11-10 16:38:13', 1),
-(4, 2, 2, '13.00', '2017-06-02 16:12:56', 1),
-(5, 3, 1, '11.00', '2020-11-10 16:46:45', 1),
-(6, 3, 2, '3.00', '2020-11-10 16:38:34', 1),
-(7, 1, 3, '3.00', '2017-06-13 19:17:30', 1),
-(8, 3, 3, '13.00', '2020-11-10 16:21:53', 1),
-(9, 2, 3, '13.00', '2020-11-10 16:22:29', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -238,15 +201,6 @@ CREATE TABLE `pos_product` (
   `status_id` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `pos_product`
---
-
-INSERT INTO `pos_product` (`id`, `product_code`, `product_name`, `product_uom`, `status_id`) VALUES
-(1, '1111', 'asdfasdfasdf', 1, 1),
-(2, '234234', 'tst2', 1, 1),
-(3, '2222', 'testing3', 1, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -257,15 +211,6 @@ CREATE TABLE `pos_product_discount` (
   `id` int(11) NOT NULL,
   `discount_type` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `pos_product_discount`
---
-
-INSERT INTO `pos_product_discount` (`id`, `discount_type`) VALUES
-(1, 'Percentage'),
-(3, 'Total Price'),
-(2, 'Unit Price');
 
 -- --------------------------------------------------------
 
@@ -307,25 +252,6 @@ CREATE TABLE `pos_sale` (
   `status_id` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `pos_sale`
---
-
-INSERT INTO `pos_sale` (`id`, `dt`, `tran_id`, `product_id`, `qty`, `buyer_id`, `current_price`, `discount_type`, `discount_qty`, `discount_total`, `total`, `status_id`) VALUES
-(1, '2017-05-31 15:18:39', 1, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 2),
-(2, '2017-05-31 15:23:16', 2, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 1),
-(3, '2017-05-31 15:24:00', 3, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 1),
-(4, '2017-05-31 15:25:50', 4, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 1),
-(5, '2017-05-31 15:26:06', 5, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 1),
-(6, '2017-05-31 15:31:57', 6, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 1),
-(7, '2017-05-31 15:33:08', 7, 1, '1.00', 1, '11.00', 0, '0.00', '0.00', '11.00', 1),
-(8, '2017-05-31 22:14:38', 8, 2, '1.00', 1, '0.00', 0, '0.00', '0.00', '0.00', 1),
-(9, '2017-05-31 22:14:38', 8, 2, '1.00', 1, '123.00', 0, '0.00', '0.00', '123.00', 1),
-(11, '2017-06-01 15:47:34', 9, 2, '1.00', 1, '123.00', 0, '0.00', '0.00', '123.00', 1),
-(12, '2017-06-02 16:11:48', 10, 2, '1.00', 1, '123.00', 0, '0.00', '0.00', '123.00', 1),
-(13, '2017-06-02 16:13:20', 11, 2, '1.00', 2, '13.00', 0, '0.00', '0.00', '13.00', 1),
-(14, '2017-06-13 19:17:47', 12, 3, '1.00', 1, '3.00', 0, '0.00', '0.00', '3.00', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -338,16 +264,6 @@ CREATE TABLE `pos_sale_lock` (
   `user_id` int(11) NOT NULL,
   `action_id` int(11) NOT NULL COMMENT '1 - lock; 2 - unlock'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `pos_sale_lock`
---
-
-INSERT INTO `pos_sale_lock` (`id`, `dt`, `user_id`, `action_id`) VALUES
-(1, '2017-06-18 01:00:00', 1, 2),
-(2, '2017-06-15 02:00:00', 1, 1),
-(3, '2017-06-18 18:31:27', 1, 2),
-(4, '2017-06-19 13:20:09', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -425,15 +341,6 @@ CREATE TABLE `pos_stock` (
   `status_id` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `pos_stock`
---
-
-INSERT INTO `pos_stock` (`id`, `dt`, `product_id`, `qty`, `supplier_id`, `received_by`, `dt_encoded`, `dt_cancelled`, `cancelled_by`, `cancelled_reason`, `status_id`) VALUES
-(1, '2017-05-30', 1, '110.00', 1, 1, '', NULL, NULL, NULL, 1),
-(2, '2017-05-31', 2, '12.00', 1, 1, '', NULL, NULL, NULL, 1),
-(3, '2017-06-13', 3, '100.00', 1, 1, '', NULL, NULL, NULL, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -450,8 +357,8 @@ CREATE TABLE `pos_stock_status` (
 --
 
 INSERT INTO `pos_stock_status` (`id`, `status`) VALUES
-(1, 'CONFIRMED'),
-(2, 'CANCELLED');
+(1, 'ACTIVE'),
+(2, 'INACTIVE');
 
 -- --------------------------------------------------------
 
@@ -464,13 +371,6 @@ CREATE TABLE `pos_supplier` (
   `supplier` varchar(100) NOT NULL,
   `description` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `pos_supplier`
---
-
-INSERT INTO `pos_supplier` (`id`, `supplier`, `description`) VALUES
-(1, 'asfas', 'asdf');
 
 -- --------------------------------------------------------
 
@@ -487,55 +387,6 @@ CREATE TABLE `pos_trail` (
   `remarks` text NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `pos_trail`
---
-
-INSERT INTO `pos_trail` (`id`, `dt`, `module_id`, `action_id`, `particular`, `remarks`, `user_id`) VALUES
-(1, '2017-05-30 10:52:33', 2, 8, '', '', 1),
-(2, '2017-05-30 10:52:42', 2, 10, '1111 - asdfasdfasdf', '', 1),
-(3, '2017-05-30 10:53:01', 4, 10, 'asfas', '', 1),
-(4, '2017-05-30 10:53:24', 3, 10, '1111 - asdfasdfasdf', 'QTY: 110.00', 1),
-(5, '2017-05-31 15:18:23', 5, 8, '', '', 1),
-(6, '2017-05-31 15:18:27', 4, 8, '', '', 1),
-(7, '2017-05-31 15:18:39', 1, 1, '1700000001', '', 1),
-(8, '2017-05-31 15:18:39', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(9, '2017-05-31 15:23:16', 1, 1, '1700000002', '', 1),
-(10, '2017-05-31 15:23:16', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(11, '2017-05-31 15:24:00', 1, 1, '1700000003', '', 1),
-(12, '2017-05-31 15:24:00', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(13, '2017-05-31 15:25:50', 1, 1, '1700000004', '', 1),
-(14, '2017-05-31 15:25:50', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(15, '2017-05-31 15:26:06', 1, 1, '1700000005', '', 1),
-(16, '2017-05-31 15:26:06', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(17, '2017-05-31 15:31:57', 1, 1, '1700000006', '', 1),
-(18, '2017-05-31 15:31:57', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(19, '2017-05-31 15:33:08', 1, 1, '1700000007', '', 1),
-(20, '2017-05-31 15:33:08', 6, 1, '1111 - asdfasdfasdf', '', 1),
-(21, '2017-05-31 22:11:53', 2, 10, '234234 - tst2', '', 1),
-(22, '2017-05-31 22:12:07', 3, 10, '234234 - tst2', 'QTY: 12.00', 1),
-(23, '2017-05-31 22:14:38', 1, 1, '1700000008', '', 1),
-(24, '2017-05-31 22:14:38', 6, 1, '234234 - tst2', '', 1),
-(25, '2017-05-31 22:14:38', 6, 1, '234234 - tst2', '', 1),
-(26, '2017-06-01 15:47:34', 1, 1, '1700000009', '', 1),
-(27, '2017-06-01 15:47:34', 6, 1, '234234 - tst2', '', 1),
-(28, '2017-06-02 16:11:48', 1, 1, '1700000010', '', 1),
-(29, '2017-06-02 16:11:48', 6, 1, '234234 - tst2', '', 1),
-(30, '2017-06-02 16:13:20', 1, 1, '1700000011', '', 1),
-(31, '2017-06-02 16:13:20', 6, 1, '234234 - tst2', '', 1),
-(32, '2017-06-13 16:07:36', 5, 8, '', '', 1),
-(33, '2017-06-13 16:07:39', 4, 8, '', '', 1),
-(34, '2017-05-31 00:00:00', 3, 8, '', '', 1),
-(35, '2017-06-13 16:07:44', 2, 8, '', '', 1),
-(36, '2017-06-13 19:11:55', 2, 10, '2222 - testing3', '', 1),
-(37, '2017-06-13 19:12:20', 3, 10, '2222 - testing3', 'QTY: 100.00', 1),
-(38, '2017-06-13 19:13:19', 2, 8, '', '', 1),
-(39, '2017-06-13 19:17:47', 1, 1, '1700000012', '', 1),
-(40, '2017-06-13 19:17:47', 6, 1, '2222 - testing3', '', 1),
-(41, '2020-11-10 15:39:52', 2, 8, '', '', 1),
-(42, '2020-11-10 15:47:36', 2, 8, '', '', 1),
-(43, '2020-11-10 16:41:23', 2, 8, '', '', 1);
 
 -- --------------------------------------------------------
 
@@ -557,36 +408,7 @@ CREATE TABLE `pos_trail_login` (
 --
 
 INSERT INTO `pos_trail_login` (`id`, `dt`, `user_id`, `local_ip`, `public_ip`, `computer_name`) VALUES
-(1, '2017-05-31 15:17:32', 1, '192.168.2.37', NULL, NULL),
-(2, '2017-05-31 15:23:01', 1, '192.168.2.37', NULL, NULL),
-(3, '2017-06-01 10:28:53', 1, '192.168.2.37', NULL, NULL),
-(4, '2017-06-02 15:34:02', 1, '192.168.2.37', NULL, NULL),
-(5, '2017-06-03 08:34:14', 1, '192.168.2.37', NULL, NULL),
-(6, '2017-06-03 09:13:24', 1, '192.168.2.37', NULL, NULL),
-(7, '2017-06-06 10:40:46', 1, '192.168.2.37', NULL, NULL),
-(8, '2017-06-06 21:00:36', 1, '192.168.2.76 or perhaps 2001::9d38:90d7:306e:3d01:3f57:fdb3', NULL, NULL),
-(9, '2017-06-07 09:45:15', 1, '192.168.2.37', NULL, NULL),
-(10, '2017-06-13 16:06:33', 1, '192.168.2.37', NULL, NULL),
-(11, '2017-06-13 19:10:05', 1, '10.0.0.202', NULL, NULL),
-(12, '2017-06-13 19:20:19', 17, '192.168.2.76 or perhaps 2001::9d38:90d7:14ca:1635:3f57:fdb3', NULL, NULL),
-(13, '2017-06-13 19:20:34', 1, '192.168.2.76 or perhaps 2001::9d38:90d7:14ca:1635:3f57:fdb3', NULL, NULL),
-(14, '2017-06-13 19:21:26', 17, '192.168.2.76 or perhaps 2001::9d38:90d7:14ca:1635:3f57:fdb3', NULL, NULL),
-(15, '2017-06-16 08:52:57', 1, '192.168.2.37', NULL, NULL),
-(16, '2017-06-16 16:08:25', 1, '192.168.2.37', NULL, NULL),
-(17, '2017-06-17 21:49:28', 1, '192.168.2.76 or perhaps 2001::9d38:6abd:1467:1100:3f57:fdb3', NULL, NULL),
-(18, '2017-06-18 14:02:39', 1, '192.168.2.76 or perhaps 2001::9d38:6abd:3c2f:37dd:3f57:fdb3', NULL, NULL),
-(19, '2017-06-18 15:02:49', 1, '192.168.2.76 or perhaps 2001::9d38:90d7:20d5:178:3f57:fdb3', NULL, NULL),
-(20, '2017-06-18 15:17:24', 1, '192.168.2.76 or perhaps 2001::9d38:6abd:896:99f:3f57:fdb3', NULL, NULL),
-(21, '2017-06-19 13:04:48', 1, '192.168.2.37', NULL, NULL),
-(22, '2018-06-28 09:20:54', 1, '192.168.2.37', NULL, NULL),
-(23, '2018-06-30 23:26:20', 1, '192.168.2.76', NULL, NULL),
-(24, '2018-07-01 20:52:23', 1, '192.168.2.76', NULL, NULL),
-(25, '2018-07-13 16:37:14', 1, '192.168.2.37', NULL, NULL),
-(26, '2020-11-10 14:14:58', 1, '1b1c6e85-826f-4f7a-830e-52e68c49b138.local', NULL, NULL),
-(27, '2020-11-23 18:23:32', 1, '8a97e4e8-77d2-4a37-8d5a-ebb4a26dee33.local', NULL, NULL),
-(28, '2020-12-17 11:55:48', 1, '4d68cd11-4f0f-4349-a3ea-4827d63743f0.local', NULL, NULL),
-(29, '2020-12-17 15:43:54', 14, '4d68cd11-4f0f-4349-a3ea-4827d63743f0.local', NULL, NULL),
-(30, '2020-12-17 17:17:29', 14, '4d68cd11-4f0f-4349-a3ea-4827d63743f0.local', NULL, NULL);
+(1, '2022-03-06 06:27:38', 1, '4285da4d-3d00-43b4-b433-b299784ced17.local', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -602,16 +424,6 @@ CREATE TABLE `pos_trail_price` (
   `created_by` int(11) NOT NULL,
   `remarks` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `pos_trail_price`
---
-
-INSERT INTO `pos_trail_price` (`id`, `product_id`, `price`, `dt_created`, `created_by`, `remarks`) VALUES
-(1, 0, '14.00', '2020-11-10 06:36:44', 1, NULL),
-(2, 1, '14.00', '2020-11-10 06:38:13', 1, NULL),
-(3, 2, '3.00', '2020-11-10 06:38:34', 1, NULL),
-(4, 1, '11.00', '2020-11-10 06:46:47', 1, 'as per phone advice by joyces');
 
 -- --------------------------------------------------------
 
@@ -663,24 +475,6 @@ CREATE TABLE `pos_transaction` (
   `status_id` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `pos_transaction`
---
-
-INSERT INTO `pos_transaction` (`id`, `dt`, `subtotal`, `discount_type`, `discount_qty`, `discount_total`, `total`, `tran_cash`, `tran_change`, `user_id`, `remarks`, `dt_cancelled`, `cancelled_by`, `cancelled_reason`, `status_id`) VALUES
-(1, '2017-05-31 15:18:39', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', '2017-06-01 15:22:51', 1, 'sdaf', 2),
-(2, '2017-05-31 15:23:16', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', NULL, 0, NULL, 1),
-(3, '2017-05-31 15:24:00', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', NULL, 0, NULL, 1),
-(4, '2017-05-31 15:25:50', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', NULL, 0, NULL, 1),
-(5, '2017-05-31 15:26:06', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', NULL, 0, NULL, 1),
-(6, '2017-05-31 15:31:57', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', NULL, 0, NULL, 1),
-(7, '2017-05-31 15:33:08', '11.00', 0, '0.00', '0.00', '11.00', '20.00', '9.00', 1, '', NULL, 0, NULL, 1),
-(8, '2017-05-31 22:14:38', '123.00', 0, '0.00', '0.00', '123.00', '1110.00', '987.00', 1, '', NULL, 0, NULL, 1),
-(9, '2017-06-01 15:47:34', '123.00', 0, '0.00', '0.00', '123.00', '200.00', '77.00', 1, '', NULL, 0, NULL, 1),
-(10, '2017-06-02 16:11:48', '123.00', 0, '0.00', '0.00', '123.00', '300.00', '177.00', 1, '', NULL, 0, NULL, 1),
-(11, '2017-06-02 16:13:20', '13.00', 0, '0.00', '0.00', '13.00', '20.00', '7.00', 1, '', NULL, 0, NULL, 1),
-(12, '2017-06-13 19:17:47', '3.00', 0, '0.00', '0.00', '3.00', '30.00', '27.00', 1, '', NULL, 0, NULL, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -691,14 +485,6 @@ CREATE TABLE `pos_transaction_discount` (
   `id` int(11) NOT NULL,
   `discount_type` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `pos_transaction_discount`
---
-
-INSERT INTO `pos_transaction_discount` (`id`, `discount_type`) VALUES
-(2, 'Amount'),
-(1, 'Percentage');
 
 -- --------------------------------------------------------
 
@@ -736,7 +522,9 @@ CREATE TABLE `pos_uom` (
 --
 
 INSERT INTO `pos_uom` (`id`, `uom`, `description`) VALUES
-(1, 'KG', 'kilo');
+(1, 'KG', 'kilo'),
+(2, 'PC', 'Piece/s'),
+(3, 'TIN', 'Tins');
 
 -- --------------------------------------------------------
 
@@ -765,10 +553,11 @@ CREATE TABLE `pos_user` (
 
 INSERT INTO `pos_user` (`id`, `username`, `password`, `fname`, `lname`, `mname`, `dept_id`, `email`, `access_id`, `status_id`, `added_by`, `date_added`) VALUES
 (1, 'jaypee.hindang', '$2y$12$fxFfMSKyotrXlft3a.12kOF1LLRiuKRxKV0QCbSKm3.DwPtDcIJCu', 'jaypee', 'hindang', '', 1, 'eujay_29@yahoo.com.ph', 1, 1, 1, '2015-06-10'),
-(10, 'audit', '$2y$12$1ZMYdbKxpAtE0R3T2xCFW.dqyx8JGfXIMHwOEfo3szAz7xyW6uktW', 'Audit', 'Department', '', 8, NULL, 4, 1, 1, '2016-06-26'),
-(11, 'accounting', '$2y$12$1ZMYdbKxpAtE0R3T2xCFW.dqyx8JGfXIMHwOEfo3szAz7xyW6uktW', 'Accounting', 'Department', '', 4, '', 3, 1, 1, '2016-06-26'),
-(14, 'user', '$2y$12$e5jDU9UMzXn9qMXPx.AMP.WCSBCRAZuH7ib/tl3sbhjFxrO./05Ae', 'user', 'user', '', 3, '', 2, 1, 1, '2016-11-07'),
-(17, 'admin', '$2y$12$hAqAkUzogX01pCf510wuh.b1Q4/mDfYXcQtaWgqwM59h6WR/2Zcs.', 'ADMIN', 'ADMIN', '', 3, '', 1, 1, 1, '2017-04-19');
+(2, 'admin', '$2y$12$hAqAkUzogX01pCf510wuh.b1Q4/mDfYXcQtaWgqwM59h6WR/2Zcs.', 'ADMIN', 'ADMIN', '', 3, '', 1, 1, 1, '2017-04-19'),
+(3, 'audit', '$2y$12$1ZMYdbKxpAtE0R3T2xCFW.dqyx8JGfXIMHwOEfo3szAz7xyW6uktW', 'Audit', 'Department', '', 8, NULL, 4, 1, 1, '2016-06-26'),
+(4, 'accounting', '$2y$12$1ZMYdbKxpAtE0R3T2xCFW.dqyx8JGfXIMHwOEfo3szAz7xyW6uktW', 'Accounting', 'Department', '', 4, '', 3, 1, 1, '2016-06-26'),
+(5, 'user', '$2y$12$e5jDU9UMzXn9qMXPx.AMP.WCSBCRAZuH7ib/tl3sbhjFxrO./05Ae', 'user', 'user', '', 3, '', 2, 1, 1, '2016-11-07'),
+(6, 'report', '$2y$12$Xf/55bcw7xHltQou5G6wo.5/IDcO4r4xNPMgt28JPOtx0BOmi1hqq', 'REPORT', 'ONLY', '', 4, '', 5, 1, 1, '2021-03-11');
 
 -- --------------------------------------------------------
 
@@ -809,13 +598,13 @@ CREATE TABLE `tbl_qoutes` (
 --
 
 INSERT INTO `tbl_qoutes` (`id`, `qoutes`, `author`, `dt_added`, `added_by`, `status_id`) VALUES
-(1, 'Ability is what you''re capable of doing. \r\nMotivation determines what you do. \r\nAttitude determines how well you do it.', 'Lou Holtz', '2016-08-17 09:45:00 PM', 1, 1),
+(1, 'Ability is what you\'re capable of doing. \r\nMotivation determines what you do. \r\nAttitude determines how well you do it.', 'Lou Holtz', '2016-08-17 09:45:00 PM', 1, 1),
 (2, 'A great attitude becomes a great day, which becomes a great month, which becomes a great year, which becomes a great life.', 'Mandy Hale', '2016-08-17 09:45:00 PM', 1, 1),
 (3, 'All our dreams can come true - if we have the courage to pursue them.', 'Walt Disney', '2016-08-17 09:45:00 PM', 1, 1),
 (4, 'All things are difficult before they are easy.', 'Thomas Fuller', '2016-08-17 09:45:00 PM', 1, 1),
 (5, 'Always be a first-rate version of yourself, instead of a second-rate version of somebody else.', 'Judy Garland', '2016-08-17 09:45:00 PM', 1, 1),
-(6, 'Always dream and shoot higher than you know you can do. Don''t bother just to be better than your contemporaries or predecessors. Try to be better than yourself.', 'William Faulkner', '2016-08-17 09:45:00 PM', 1, 1),
-(7, 'Always remember: \r\nYou''re braver than you believe, \r\nstronger than you seem, \r\nand smarter than you think.', 'A.A. Milne - Christopher Robin to Pooh', '2016-08-17 09:45:00 PM', 1, 1),
+(6, 'Always dream and shoot higher than you know you can do. Don\'t bother just to be better than your contemporaries or predecessors. Try to be better than yourself.', 'William Faulkner', '2016-08-17 09:45:00 PM', 1, 1),
+(7, 'Always remember: \r\nYou\'re braver than you believe, \r\nstronger than you seem, \r\nand smarter than you think.', 'A.A. Milne - Christopher Robin to Pooh', '2016-08-17 09:45:00 PM', 1, 1),
 (8, 'A man is but of product of his thought. \r\nWhat he thinks he becomes.', 'Mahatma Gandhi', '2016-08-17 09:45:00 PM', 1, 1),
 (9, 'And will you succeed? Yes indeed, yes indeed! Ninety-eight and three-quarters percent guaranteed!', 'Dr. Seuss', '2016-08-17 09:45:00 PM', 1, 1),
 (10, 'Anyone who has never made a mistake has never tried anything new', 'Albert Einstein', '2016-08-17 09:45:00 PM', 1, 1),
@@ -825,30 +614,30 @@ INSERT INTO `tbl_qoutes` (`id`, `qoutes`, `author`, `dt_added`, `added_by`, `sta
 (14, 'Beautiful pictures are developed from negatives in a dark room. So if you see darkness in your life be reassured that a beautiful picture is being prepared.', 'Author Unknown', '2016-08-17 10:00:00 PM', 1, 1),
 (15, 'Confidence is contagious. So is lack of confidence.', 'Vince Lombardi', '2016-08-17 10:00:00 PM', 1, 1),
 (16, 'Courage is very important. Like a muscle, it is strengthened by use.', 'Ruth Gordon', '2016-08-17 10:00:00 PM', 1, 1),
-(17, 'Don''t be afraid to give your best to what seemingly are small jobs. Every time you conquer one it makes you that much stronger. If you do the little jobs well, the big ones will tend to take care of themselves.', 'Dale Carnegie', '2016-08-17 10:00:00 PM', 0, 1),
-(18, 'Don''t cry because it''s over. Smile because it happened.', 'Dr. Seuss', '2016-08-17 10:00:00 PM', 0, 1),
-(19, 'Don''t give up. I believe in you all. \r\nA person''s a person no matter how small.', 'Dr. Seuss', '2016-08-17 10:00:00 PM', 1, 1),
-(20, 'They say you only fall in love once, but that can''t be true. Every time I look at you, I fall in love all over again.', 'Anonymous', '2016-08-17 10:00:00 PM', 1, 1),
+(17, 'Don\'t be afraid to give your best to what seemingly are small jobs. Every time you conquer one it makes you that much stronger. If you do the little jobs well, the big ones will tend to take care of themselves.', 'Dale Carnegie', '2016-08-17 10:00:00 PM', 0, 1),
+(18, 'Don\'t cry because it\'s over. Smile because it happened.', 'Dr. Seuss', '2016-08-17 10:00:00 PM', 0, 1),
+(19, 'Don\'t give up. I believe in you all. \r\nA person\'s a person no matter how small.', 'Dr. Seuss', '2016-08-17 10:00:00 PM', 1, 1),
+(20, 'They say you only fall in love once, but that can\'t be true. Every time I look at you, I fall in love all over again.', 'Anonymous', '2016-08-17 10:00:00 PM', 1, 1),
 (21, 'Every love story is beautiful but ours is my favorite.', 'Anonymous', '2016-08-17 10:00:00 PM', 1, 1),
-(22, 'When I saw you, I was afraid to meet you. When I met you, I was afraid to kiss you. When I kissed you, I was afraid to love you. Now that I love you, I''m afraid to lose you.', 'Rene Yasenek', '2016-08-17 10:00:00 PM', 1, 1),
-(23, 'The best way to not get your heart broken, is pretending you don''t have one.', 'Charlie Sheen', '2016-08-17 10:00:00 PM', 1, 1),
+(22, 'When I saw you, I was afraid to meet you. When I met you, I was afraid to kiss you. When I kissed you, I was afraid to love you. Now that I love you, I\'m afraid to lose you.', 'Rene Yasenek', '2016-08-17 10:00:00 PM', 1, 1),
+(23, 'The best way to not get your heart broken, is pretending you don\'t have one.', 'Charlie Sheen', '2016-08-17 10:00:00 PM', 1, 1),
 (24, 'A true friend knows your weaknesses but shows you your strengths; feels your fears but fortifies your faith; sees your anxieties but frees your spirit; recognizes your disabilities but emphasizes your possibilities.', 'William Arthur Ward', '2016-08-17 10:00:00 PM', 1, 1),
 (25, 'If I could give you one thing in life, I would give you the ability to see yourself through my eyes, only then will you realize how special you are to me.', 'Anonymous', '2016-08-17 10:00:00 PM', 1, 1),
-(26, 'Some people are like clouds. When they go away, it''s a brighter day.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(27, 'Don''t know where your kids are in the house? Turn off the internet and they''ll show up quickly.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(28, 'I changed my password everywhere to ''incorrect.'' That way when I forget it, it always reminds me, ''Your password is incorrect.''', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(29, 'When you wake up at 6 in the morning, you close your eyes for 5 minutes and it''s already 6:45. When you''re at work and it''s 2:30, you close your eyes for 5 minutes and it''s 2:31.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(26, 'Some people are like clouds. When they go away, it\'s a brighter day.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(27, 'Don\'t know where your kids are in the house? Turn off the internet and they\'ll show up quickly.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(28, 'I changed my password everywhere to \'incorrect.\' That way when I forget it, it always reminds me, \'Your password is incorrect.\'', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(29, 'When you wake up at 6 in the morning, you close your eyes for 5 minutes and it\'s already 6:45. When you\'re at work and it\'s 2:30, you close your eyes for 5 minutes and it\'s 2:31.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
 (30, 'A best friend is like a four leaf clover, hard to find, lucky to have.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(31, 'I know the voices in my head aren''t real..... but sometimes their ideas are just absolutely awesome!', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(32, 'I don''t need a hair stylist, my pillow gives me a new hairstyle every morning. ', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(33, 'I don''t need a hair stylist, my pillow gives me a new hairstyle every morning. ', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(31, 'I know the voices in my head aren\'t real..... but sometimes their ideas are just absolutely awesome!', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(32, 'I don\'t need a hair stylist, my pillow gives me a new hairstyle every morning. ', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(33, 'I don\'t need a hair stylist, my pillow gives me a new hairstyle every morning. ', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
 (34, 'I miss the days when you could just push someone in the swimming pool without worrying about their cell phone.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(35, 'I''m not running away from hard work, I''m too lazy to run.', 'Anonymous', '2016-08-17 10:13:00 PM', 0, 1),
+(35, 'I\'m not running away from hard work, I\'m too lazy to run.', 'Anonymous', '2016-08-17 10:13:00 PM', 0, 1),
 (36, 'Dear humans, in case you forgot, I used to be your Internet. Sincerely, The Library.  ', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
 (37, 'For you, I would swim across the ocean. LOL, just kidding, there are sharks in there.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(38, 'Never wrestle with a pig. You''ll both get dirty, and the pig likes it.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
+(38, 'Never wrestle with a pig. You\'ll both get dirty, and the pig likes it.', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
 (39, 'Your eyes water when you yawn because you miss your bed and it makes you sad. ', 'Anonymous', '2016-08-17 10:13:00 PM', 1, 1),
-(40, 'Reporter: "Excuse me, may I interview you?" \r\nMan: "Yes!" \r\nReporter: "Name?" \r\nMan: "Abdul Al-Rhazim." \r\nReporter: "Sex?" \r\nMan: "Three to five times a week." \r\nReporter: "No no! I mean male or female?" \r\nMan: "Yes, male, female... sometimes camel." \r\nReporter: "Holy cow!" \r\nMan: "Yes, cow, sheep... animals in general." \r\nReporter: "But isn''t that hostile?" \r\nMan: "Yes, horse style, dog style, any style." \r\nReporter: "Oh dear!" \r\nMan: "No, no deer. Deer run too fast. Hard to catch."', 'anonymous', '2016-10-20 04:01:00 PM', 1, 1);
+(40, 'Reporter: \"Excuse me, may I interview you?\" \r\nMan: \"Yes!\" \r\nReporter: \"Name?\" \r\nMan: \"Abdul Al-Rhazim.\" \r\nReporter: \"Sex?\" \r\nMan: \"Three to five times a week.\" \r\nReporter: \"No no! I mean male or female?\" \r\nMan: \"Yes, male, female... sometimes camel.\" \r\nReporter: \"Holy cow!\" \r\nMan: \"Yes, cow, sheep... animals in general.\" \r\nReporter: \"But isn\'t that hostile?\" \r\nMan: \"Yes, horse style, dog style, any style.\" \r\nReporter: \"Oh dear!\" \r\nMan: \"No, no deer. Deer run too fast. Hard to catch.\"', 'anonymous', '2016-10-20 04:01:00 PM', 1, 1);
 
 --
 -- Indexes for dumped tables
@@ -1062,157 +851,189 @@ ALTER TABLE `tbl_qoutes`
 -- AUTO_INCREMENT for table `pos_access`
 --
 ALTER TABLE `pos_access`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
 --
 -- AUTO_INCREMENT for table `pos_action`
 --
 ALTER TABLE `pos_action`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
 --
 -- AUTO_INCREMENT for table `pos_buyer`
 --
 ALTER TABLE `pos_buyer`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
 --
 -- AUTO_INCREMENT for table `pos_buyer_status`
 --
 ALTER TABLE `pos_buyer_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `pos_dept`
 --
 ALTER TABLE `pos_dept`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
 --
 -- AUTO_INCREMENT for table `pos_discount`
 --
 ALTER TABLE `pos_discount`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_module`
 --
 ALTER TABLE `pos_module`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_price`
 --
 ALTER TABLE `pos_price`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_product`
 --
 ALTER TABLE `pos_product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_product_discount`
 --
 ALTER TABLE `pos_product_discount`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_product_status`
 --
 ALTER TABLE `pos_product_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `pos_sale`
 --
 ALTER TABLE `pos_sale`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_sale_lock`
 --
 ALTER TABLE `pos_sale_lock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_sale_lock_action`
 --
 ALTER TABLE `pos_sale_lock_action`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `pos_sale_status`
 --
 ALTER TABLE `pos_sale_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `pos_sale_temp`
 --
 ALTER TABLE `pos_sale_temp`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_stock`
 --
 ALTER TABLE `pos_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_stock_status`
 --
 ALTER TABLE `pos_stock_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `pos_supplier`
 --
 ALTER TABLE `pos_supplier`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_trail`
 --
 ALTER TABLE `pos_trail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_trail_login`
 --
 ALTER TABLE `pos_trail_login`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `pos_trail_price`
 --
 ALTER TABLE `pos_trail_price`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_trail_stock`
 --
 ALTER TABLE `pos_trail_stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_trail_transaction`
 --
 ALTER TABLE `pos_trail_transaction`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_transaction`
 --
 ALTER TABLE `pos_transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_transaction_discount`
 --
 ALTER TABLE `pos_transaction_discount`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `pos_transaction_status`
 --
 ALTER TABLE `pos_transaction_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `pos_uom`
 --
 ALTER TABLE `pos_uom`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT for table `pos_user`
 --
 ALTER TABLE `pos_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
 --
 -- AUTO_INCREMENT for table `pos_user_status`
 --
 ALTER TABLE `pos_user_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 --
 -- AUTO_INCREMENT for table `tbl_qoutes`
 --
 ALTER TABLE `tbl_qoutes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

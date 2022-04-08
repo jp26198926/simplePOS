@@ -1,5 +1,6 @@
 <?php
 include('validate.php');
+include('config.php');
 $mnu = 'menu_product';
 ?>
 
@@ -7,7 +8,7 @@ $mnu = 'menu_product';
 <html>
 
 <head>
-  <title>Simple POS</title>
+  <title><?= $app_name; ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="./assets/css/jquery-ui.min.css" rel="stylesheet">

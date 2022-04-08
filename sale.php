@@ -1,5 +1,6 @@
 <?php
 include('validate.php');
+include('config.php');
 $mnu = 'menu_sale';
 ?>
 
@@ -7,7 +8,7 @@ $mnu = 'menu_sale';
 <html>
 
 <head>
-  <title>Simple POS</title>
+  <title><?= $app_name; ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -258,7 +259,7 @@ $mnu = 'menu_sale';
 
   <!-- printing template -->
   <div style='display:none;'>
-    <div id="print" style='font-size: 9pt; font-family: fonta11, arial; margin: 0;'>
+    <div id="print" style='font-size: 9pt; font-family: saxmono, fonta11, arial; margin: 0;'>
       <div id="print_header" class="table-responsive">
         <table class='table' style='width:100%;'>
           <tr>
@@ -268,14 +269,14 @@ $mnu = 'menu_sale';
             <td>&nbsp;</td>
           </tr>
           <tr>
-            <td colspan='2'>SIMPLE POS</td>
+            <td colspan='2'><?= $app_name; ?></td>
           </tr>
           <tr>
-            <td colspan='2'>Lae City, PNG</td>
+            <td colspan='2'><?= $address; ?></td>
           </tr>
           <tr>
             <td align='left'>TIN #:</td>
-            <td align='right' id='sale_receipt_tin'>000000000</td>
+            <td align='right' id='sale_receipt_tin'><?= $tin_no; ?></td>
           </tr>
           <tr>
             <td align='left'>Receipt #:</td>
