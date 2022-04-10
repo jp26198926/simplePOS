@@ -14,7 +14,7 @@
                 include('query_inventory.php');
 
                 if ($product){
-                    $sql .= " WHERE CONCAT_WS(' ',  p.product_code, p.product_name ) LIKE '%{$product}%' ";
+                    $sql .= " WHERE CONCAT_WS(' ',  p.product_code, p.product_name, c.category ) LIKE '%{$product}%' ";
                 }
 
                 $sql .= ' ORDER BY p.product_name;';
@@ -34,4 +34,3 @@
     }
     
     $mysqli->close();
-?>

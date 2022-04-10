@@ -253,6 +253,7 @@ $mnu = 'menu_report';
                                   <th>Product Name</th>
                                   <th>QTY</th>
                                   <th>UOM</th>
+                                  <th>Category</th>
                                   <th>Buyer Type</th>
                                   <th>Price</th>
                                   <!--
@@ -308,6 +309,7 @@ $mnu = 'menu_report';
                                   <th rowspan='2'>Product Code</th>
                                   <th rowspan='2'>Product Name</th>
                                   <th rowspan='2'>UOM</th>
+                                  <th rowspan='2'>Category</th>
                                   <th colspan='2'>Insider</th>
                                   <th colspan='2'>Outsider</th>
                                   <th colspan='2'>Kitchen</th>
@@ -379,6 +381,7 @@ $mnu = 'menu_report';
                                   <th>Product Code</th>
                                   <th>Product Name</th>
                                   <th>UOM</th>
+                                  <th>Category</th>
                                   <th>CURRENT BALANCE</th>
                                 </tr>
                               </thead>

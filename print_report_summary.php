@@ -61,9 +61,10 @@ if (!empty($_SESSION['sales_sql_summary']) || $_SESSION['sales_sql_summary'] != 
 
     $tbl_list = "   <table cellspacing=\"0\" cellpadding=\"1\"  border=\"1\" >
                             <tr align=\"center\" >                                
-                                <th rowspan=\"2\"  width=\"15%\" align=\"center\" ><b>PRODUCT CODE</b></th>
+                                <th rowspan=\"2\"  width=\"8%\" align=\"center\" ><b>PRODUCT CODE</b></th>
                                 <th rowspan=\"2\" width=\"20%\" align=\"center\" ><b>PRODUCT NAME</b></th>
                                 <th rowspan=\"2\" width=\"5%\" align=\"center\" ><b>UOM</b></th>
+                                <th rowspan=\"2\" width=\"7%\" align=\"center\" ><b>CATEGORY</b></th>
                                 <th colspan=\"2\" width=\"10%\" align=\"center\" ><b>INSIDER</b></th>
                                 <th colspan=\"2\" width=\"10%\" align=\"center\" ><b>OUTSIDER</b></th>
                                 <th colspan=\"2\" width=\"10%\" align=\"center\" ><b>KITCHEN</b></th>                                
@@ -114,6 +115,7 @@ if (!empty($_SESSION['sales_sql_summary']) || $_SESSION['sales_sql_summary'] != 
                 $product_code = $row->product_code;
                 $product_name = $row->product_name;
                 $uom = $row->uom;
+                $category = $row->category;
 
                 $qty = floatval($row->qty) > 0.01 ? number_format(floatval($row->qty), 2, '.', ',') : "";
                 $qty_insider = floatval($row->qty_insider) > 0.01 ? number_format(floatval($row->qty_insider), 2, '.', ',') : "";
@@ -149,6 +151,7 @@ if (!empty($_SESSION['sales_sql_summary']) || $_SESSION['sales_sql_summary'] != 
                 $tbl_list .=  "  <td>" . $product_code . "</td>";
                 $tbl_list .=  "  <td>" . $product_name . "</td>";
                 $tbl_list .=  "  <td align=\"center\" >" . $uom . "</td>";
+                $tbl_list .=  "  <td align=\"center\" >" . $category . "</td>";
 
                 $tbl_list .=  "<td align=\"right\">" . $qty_insider . "</td>";
                 $tbl_list .=  "<td align=\"right\">" . $total_insider . "</td>";
@@ -169,7 +172,7 @@ if (!empty($_SESSION['sales_sql_summary']) || $_SESSION['sales_sql_summary'] != 
             }
 
             $tbl_list .=  "<tr>";
-            $tbl_list .=  "     <td colspan=\"3\"><b>GRAND TOTAL</b></td>";
+            $tbl_list .=  "     <td colspan=\"4\"><b>GRAND TOTAL</b></td>";
             $tbl_list .=  "     <td align=\"right\"><b>" . number_format($total_qty_i, 2, '.', ',') . "</b></td>";
             $tbl_list .=  "     <td align=\"right\"><b>" . number_format($total_total_i, 2, '.', ',') . "</b></td>";
             $tbl_list .=  "     <td align=\"right\"><b>" . number_format($total_qty_o, 2, '.', ',') . "</b></td>";
@@ -182,10 +185,10 @@ if (!empty($_SESSION['sales_sql_summary']) || $_SESSION['sales_sql_summary'] != 
             $tbl_list .=  "     <td align=\"right\"><b>" . number_format($total_total, 2, '.', ',') . "</b></td>";
             $tbl_list .=  "</tr>";
         } else {
-            $tbl_list .= "<tr><td colspan=\"13\">No Record</td></tr>";
+            $tbl_list .= "<tr><td colspan=\"14\">No Record</td></tr>";
         }
     } else {
-        $tbl_list .= "<tr><td colspan=\"13\">" . $mysqli->error . "</td></tr>";
+        $tbl_list .= "<tr><td colspan=\"14\">" . $mysqli->error . "</td></tr>";
     }
 
 
@@ -209,55 +212,57 @@ if (!empty($_SESSION['sales_sql_summary']) || $_SESSION['sales_sql_summary'] != 
 require_once dirname(__FILE__) . '/library/tcpdf/tcpdf.php';
 
 // Extend the TCPDF class to create custom Header and Footer
-class MYPDF extends TCPDF {
-	
-	public $logo_path="";
-	public $company="";
-	public $address="";
-	public $page_name="";
-	public $signatory="";
+class MYPDF extends TCPDF
+{
+
+    public $logo_path = "";
+    public $company = "";
+    public $address = "";
+    public $page_name = "";
+    public $signatory = "";
 
     //Page header
-    public function Header() {
+    public function Header()
+    {
         // Logo
         //$image_file = 'images/png80.png';
-		if ($this->logo_path){ //if value has been supplied then 
-			$image_file = $this->logo_path;
-			$this->Image($image_file, 15,4, 14,'', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-		}		
-		
+        if ($this->logo_path) { //if value has been supplied then 
+            $image_file = $this->logo_path;
+            $this->Image($image_file, 15, 4, 14, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        }
+
         // Set font        
-        $this->SetFont('helvetica', 'R', 12);  
-		$this->MultiCell(100,10,$this->company,0,'L',false,0,30,6,false,0,false,true,0,'T',false);
+        $this->SetFont('helvetica', 'R', 12);
+        $this->MultiCell(100, 10, $this->company, 0, 'L', false, 0, 30, 6, false, 0, false, true, 0, 'T', false);
         //$this->MultiCell(50,10,"Frabelle PNG Ltd.",0,'L',false,0,30,6,false,0,false,true,0,'T',false);
-        
-        $this->SetFont('helvetica', 'R', 8);     
-		$this->MultiCell(50,10,$this->address,0,'L',false,0,30,8,false,0,false,true,0,'T',false);
+
+        $this->SetFont('helvetica', 'R', 8);
+        $this->MultiCell(50, 10, $this->address, 0, 'L', false, 0, 30, 8, false, 0, false, true, 0, 'T', false);
         //$this->MultiCell(50,10,"Lae City, Papua New Guinea",0,'L',false,0,30,7,false,0,false,true,0,'T',false);
-        
-        $this->SetFont('helvetica', 'B', 15);   
-		$this->Cell(0, 26, $this->page_name,0,1,'R', 0, '', 0, false, 'M', 'B');    
+
+        $this->SetFont('helvetica', 'B', 15);
+        $this->Cell(0, 26, $this->page_name, 0, 1, 'R', 0, '', 0, false, 'M', 'B');
         //$this->Cell(0, 26, 'POS - PRODUCT SOLD',0,1,'R', 0, '', 0, false, 'M', 'B');        
-        $this->writeHTML("<hr />",true,false,true,false,'');
+        $this->writeHTML("<hr />", true, false, true, false, '');
     }
 
     // Page footer
-    public function Footer() {
-         // Position at 15 mm from bottom
+    public function Footer()
+    {
+        // Position at 15 mm from bottom
         $this->SetY(-35);
         // Set font
         $this->SetFont('helvetica', 'I', 8);
         // Page number
-        $signatory=$_SESSION['signatory'];
+        $signatory = $_SESSION['signatory'];
         //$this->writeHTML($signatory,true,true);
-		$this->writeHTML($this->signatory,true,true);
-        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() , 0, false, 'C', 0, '', 0, false, 'T', 'M');
-        
+        $this->writeHTML($this->signatory, true, true);
+        $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+
         $preparedby = $_SESSION['ufullname'];
         //$rep = $_SESSION['rep'];        
-        
-    }    
-    
+
+    }
 }
 
 // create new PDF document
@@ -267,7 +272,7 @@ $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false)
 $pdf->logo_path = $logo_path;
 $pdf->company = $company;
 $pdf->address = $address;
-$pdf->page_name="POS - PRODUCT SOLD";
+$pdf->page_name = "POS - SUMMARY";
 $pdf->signatory = $signatory;
 
 

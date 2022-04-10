@@ -12,6 +12,7 @@ if ($pop) {
             $product_code = $row->product_code;
             $product_name = $row->product_name;
             $uom = $row->uom;
+            $category = $row->category;
 
             $qty = floatval($row->qty) > 0.01 ? number_format(floatval($row->qty), 2, '.', ',') : "";
             $qty_insider = floatval($row->qty_insider) > 0.01 ? number_format(floatval($row->qty_insider), 2, '.', ',') : "";
@@ -44,6 +45,7 @@ if ($pop) {
             echo "<td>{$product_code}</td>";
             echo "<td>{$product_name}</td>";
             echo "<td align='center'>{$uom}</td>";
+            echo "<td align='center'>{$category}</td>";
 
             echo "<td align='right'>{$qty_insider}</td>";
             echo "<td align='right'>{$total_insider}</td>";
@@ -73,7 +75,7 @@ if ($pop) {
             echo "</tr>";
         }
     } else {
-        echo "<tr><td colspan='13' align='center'>No Record To Display</td></tr>";
+        echo "<tr><td colspan='14' align='center'>No Record To Display</td></tr>";
     }
 
     //echo ":~|~:" . number_format($total,2,'.',',');

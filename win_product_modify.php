@@ -17,7 +17,7 @@
 					<div class='col-md-4'>
 						<label style='margin-top: 0.5em;font-weight: normal;'>Category <span style='color:red'>*</span></label>
 						<select id='txt_product_category_update' class='form-control txt-product'>
-							<option value='0'> -- Category -- </option>
+							<option value=''> -- Category -- </option>
 							<?php
 							include('connect.php');
 							$sql = "Select * from pos_category order by category;";

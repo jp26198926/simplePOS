@@ -1,6 +1,7 @@
 <?php
 
 include('validate.php');
+include('config.php');
 //$curr_date=date('Y-m-d H:i:s A');
 $dt_filename = date('Y-m-d_his');
 /**
@@ -48,7 +49,7 @@ $objPHPExcel = new PHPExcel();
 // Set document properties
 $objPHPExcel->getProperties()->setCreator($ufullname)
 	->setLastModifiedBy($ufullname)
-	->setTitle("Frabelle POS")
+	->setTitle($app_name)
 	->setSubject("Sales Summary Report")
 	->setDescription("Sales Summary Report")
 	->setKeywords("POS Excel PHP")
@@ -57,7 +58,7 @@ $objPHPExcel->getProperties()->setCreator($ufullname)
 
 // Add some data
 $objPHPExcel->setActiveSheetIndex(0)
-	->setCellValue('A1', 'Frabelle (PNG) Limited')
+	->setCellValue('A1', $company)
 	->setCellValue('A2', 'Sales Summary Report')
 
 	->setCellValue('A3', 'Date Exported')
@@ -75,26 +76,27 @@ $objPHPExcel->setActiveSheetIndex(0)
 	->setCellValue('A8', 'PRODUCT CODE')
 	->setCellValue('B8', 'PRODUCT NAME')
 	->setCellValue('C8', 'UOM')
-	->setCellValue('D8', 'INSIDER')
-	->setCellValue('F8', 'OUTSIDER')
-	->setCellValue('H8', 'KITCHEN')
-	->setCellValue('J8', 'SALE')
-	->setCellValue('L8', 'OVERALL TOTAL')
+	->setCellValue('D8', 'CATEGORY')
+	->setCellValue('E8', 'INSIDER') //
+	->setCellValue('G8', 'OUTSIDER')
+	->setCellValue('I8', 'KITCHEN')
+	->setCellValue('K8', 'SALE')
+	->setCellValue('M8', 'OVERALL TOTAL')
 
-	->setCellValue('D9', 'QTY')
-	->setCellValue('E9', 'TOTAL')
+	->setCellValue('E9', 'QTY')
+	->setCellValue('F9', 'TOTAL')
 
-	->setCellValue('F9', 'QTY')
-	->setCellValue('G9', 'TOTAL')
+	->setCellValue('G9', 'QTY')
+	->setCellValue('H9', 'TOTAL')
 
-	->setCellValue('H9', 'QTY')
-	->setCellValue('I9', 'TOTAL')
+	->setCellValue('I9', 'QTY')
+	->setCellValue('J9', 'TOTAL')
 
-	->setCellValue('J9', 'QTY')
-	->setCellValue('K9', 'TOTAL')
+	->setCellValue('K9', 'QTY')
+	->setCellValue('L9', 'TOTAL')
 
-	->setCellValue('L9', 'QTY')
-	->setCellValue('M9', 'TOTAL');
+	->setCellValue('M9', 'QTY')
+	->setCellValue('N9', 'TOTAL');
 
 $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
@@ -107,28 +109,32 @@ $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
+$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
+$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
+$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
 
 $objPHPExcel->getActiveSheet()->mergeCells('A8:A9');
 $objPHPExcel->getActiveSheet()->mergeCells('B8:B9');
 $objPHPExcel->getActiveSheet()->mergeCells('C8:C9');
-$objPHPExcel->getActiveSheet()->mergeCells('D8:E8');
-$objPHPExcel->getActiveSheet()->mergeCells('F8:G8');
-$objPHPExcel->getActiveSheet()->mergeCells('H8:I8');
-$objPHPExcel->getActiveSheet()->mergeCells('J8:K8');
-$objPHPExcel->getActiveSheet()->mergeCells('L8:M8');
+$objPHPExcel->getActiveSheet()->mergeCells('D8:D9');
+$objPHPExcel->getActiveSheet()->mergeCells('E8:F8');
+$objPHPExcel->getActiveSheet()->mergeCells('G8:H8');
+$objPHPExcel->getActiveSheet()->mergeCells('I8:J8');
+$objPHPExcel->getActiveSheet()->mergeCells('K8:L8');
+$objPHPExcel->getActiveSheet()->mergeCells('M8:N8');
 
 $objPHPExcel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
-$objPHPExcel->getActiveSheet()->getStyle('L8:M9')->getFont()->setBold(true);
+$objPHPExcel->getActiveSheet()->getStyle('L8:N9')->getFont()->setBold(true);
 
-$objPHPExcel->getActiveSheet()->getStyle('A8:M9')
+$objPHPExcel->getActiveSheet()->getStyle('A8:N9')
 	->getAlignment()->setWrapText(true);
 
-$objPHPExcel->getActiveSheet()->getStyle('A8:M9')->getAlignment()
+$objPHPExcel->getActiveSheet()->getStyle('A8:N9')->getAlignment()
 	->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
 	->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
 
-$objPHPExcel->getActiveSheet()->getStyle('D6:M7')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+$objPHPExcel->getActiveSheet()->getStyle('E6:N7')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
 $sql = $_SESSION['sales_sql_summary'];
 
@@ -165,6 +171,7 @@ if ($sql) {
 				$product_code = $row->product_code;
 				$product_name = $row->product_name;
 				$uom = $row->uom;
+				$category = $row->category;
 
 				$qty = floatval($row->qty) > 0.01 ? number_format(floatval($row->qty), 2, '.', ',') : "";
 				$qty_insider = floatval($row->qty_insider) > 0.01 ? number_format(floatval($row->qty_insider), 2, '.', ',') : "";
@@ -202,18 +209,18 @@ if ($sql) {
 					->setCellValue('A' . $i, $product_code)
 					->setCellValue('B' . $i, $product_name)
 					->setCellValue('C' . $i, $uom)
-					->setCellValue('D' . $i, $qty_insider)
-					->setCellValue('E' . $i, $total_insider)
-					->setCellValue('F' . $i, $qty_outsider)
-					->setCellValue('G' . $i, $total_outsider)
-					->setCellValue('H' . $i, $qty_kitchen)
-					->setCellValue('I' . $i, $total_kitchen)
-					->setCellValue('J' . $i, $qty_sale)
-					->setCellValue('K' . $i, $total_sale)
-					->setCellValue('L' . $i, $qty)
-					->setCellValue('M' . $i, $total);
+					->setCellValue('D' . $i, $category)
+					->setCellValue('E' . $i, $qty_insider)
+					->setCellValue('F' . $i, $total_insider)
+					->setCellValue('G' . $i, $qty_outsider)
+					->setCellValue('H' . $i, $total_outsider)
+					->setCellValue('I' . $i, $qty_kitchen)
+					->setCellValue('J' . $i, $total_kitchen)
+					->setCellValue('K' . $i, $qty_sale)
+					->setCellValue('L' . $i, $total_sale)
+					->setCellValue('M' . $i, $qty)
+					->setCellValue('N' . $i, $total);
 
-				$objPHPExcel->getActiveSheet()->getStyle('D' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 				$objPHPExcel->getActiveSheet()->getStyle('E' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 				$objPHPExcel->getActiveSheet()->getStyle('F' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 				$objPHPExcel->getActiveSheet()->getStyle('G' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
@@ -223,17 +230,18 @@ if ($sql) {
 				$objPHPExcel->getActiveSheet()->getStyle('K' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 				$objPHPExcel->getActiveSheet()->getStyle('L' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 				$objPHPExcel->getActiveSheet()->getStyle('M' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
+				$objPHPExcel->getActiveSheet()->getStyle('N' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 
 				$objPHPExcel->getActiveSheet()->getStyle('A' . $i . ':C' . $i)->getAlignment()
 					->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
 					->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-				$objPHPExcel->getActiveSheet()->getStyle('D' . $i . ':M' . $i)->getAlignment()
+				$objPHPExcel->getActiveSheet()->getStyle('E' . $i . ':N' . $i)->getAlignment()
 					->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
 					->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
 
-				$objPHPExcel->getActiveSheet()->getStyle('L' . $i . ':M' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+				$objPHPExcel->getActiveSheet()->getStyle('M' . $i . ':N' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
 				$objPHPExcel->getActiveSheet()->freezePane('A10');
 			}
@@ -242,18 +250,17 @@ if ($sql) {
 
 			$objPHPExcel->setActiveSheetIndex(0)
 				->setCellValue('A' . $i, "GRAND TOTAL")
-				->setCellValue('D' . $i, $total_qty_i)
-				->setCellValue('E' . $i, $total_total_i)
-				->setCellValue('F' . $i, $total_qty_o)
-				->setCellValue('G' . $i, $total_total_o)
-				->setCellValue('H' . $i, $total_qty_k)
-				->setCellValue('I' . $i, $total_total_k)
-				->setCellValue('J' . $i, $total_qty_s)
-				->setCellValue('K' . $i, $total_total_s)
-				->setCellValue('L' . $i, $total_qty)
-				->setCellValue('M' . $i, $total_total);
+				->setCellValue('E' . $i, $total_qty_i)
+				->setCellValue('F' . $i, $total_total_i)
+				->setCellValue('G' . $i, $total_qty_o)
+				->setCellValue('H' . $i, $total_total_o)
+				->setCellValue('I' . $i, $total_qty_k)
+				->setCellValue('J' . $i, $total_total_k)
+				->setCellValue('K' . $i, $total_qty_s)
+				->setCellValue('L' . $i, $total_total_s)
+				->setCellValue('M' . $i, $total_qty)
+				->setCellValue('N' . $i, $total_total);
 
-			$objPHPExcel->getActiveSheet()->getStyle('D' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 			$objPHPExcel->getActiveSheet()->getStyle('E' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 			$objPHPExcel->getActiveSheet()->getStyle('F' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 			$objPHPExcel->getActiveSheet()->getStyle('G' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
@@ -263,19 +270,20 @@ if ($sql) {
 			$objPHPExcel->getActiveSheet()->getStyle('K' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 			$objPHPExcel->getActiveSheet()->getStyle('L' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 			$objPHPExcel->getActiveSheet()->getStyle('M' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
+			$objPHPExcel->getActiveSheet()->getStyle('N' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 
 			$objPHPExcel->getActiveSheet()->getStyle('A' . $i . ':C' . $i)->getAlignment()
 				->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
 				->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-			$objPHPExcel->getActiveSheet()->getStyle('D' . $i . ':M' . $i)->getAlignment()
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $i . ':N' . $i)->getAlignment()
 				->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
 				->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
 
-			$objPHPExcel->getActiveSheet()->getStyle('D' . $i . ':M' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+			$objPHPExcel->getActiveSheet()->getStyle('E' . $i . ':N' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
-			$objPHPExcel->getActiveSheet()->getStyle('A' . $i . ':M' . $i)->getFont()->setBold(true);
+			$objPHPExcel->getActiveSheet()->getStyle('A' . $i . ':N' . $i)->getFont()->setBold(true);
 
 			$objPHPExcel->getActiveSheet()->mergeCells('A' . $i . ':C' . $i);
 
@@ -284,17 +292,17 @@ if ($sql) {
 				->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 		} else {
 			$objPHPExcel->getActiveSheet()->setCellValue('A10', 'Error: No Record to be printed');
-			$objPHPExcel->getActiveSheet()->mergeCells('A10:M10')
+			$objPHPExcel->getActiveSheet()->mergeCells('A10:N10')
 				->getStyle('A10:K10')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		}
 	} else {
 		$objPHPExcel->getActiveSheet()->setCellValue('A10', 'Error: ' . $mysqli->error);
-		$objPHPExcel->getActiveSheet()->mergeCells('A10:M10')
+		$objPHPExcel->getActiveSheet()->mergeCells('A10:N10')
 			->getStyle('A10:K10')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 	}
 } else {
 	$objPHPExcel->getActiveSheet()->setCellValue('A10', 'Error: Critical Error Encountered!');
-	$objPHPExcel->getActiveSheet()->mergeCells('A10:M10')
+	$objPHPExcel->getActiveSheet()->mergeCells('A10:N10')
 		->getStyle('A10:K10')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 }
 

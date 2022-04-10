@@ -1,8 +1,9 @@
 <?php
-    
-    $sql = "SELECT  p.id as id, p.product_code product_code, p.product_name product_name,
+
+$sql = "SELECT  p.id as id, p.product_code product_code, p.product_name product_name,
                     p.status_id as status_id, p.product_uom as p_uom,
                     u.uom as product_uom, u.description as uom_description,
+                    c.category,
                     s.status as status,
                     (
                     	select sum(qty) 
@@ -18,7 +19,6 @@
                     ) as sale
 
             FROM (pos_product p
-            LEFT JOIN pos_product_status s ON s.id=p.status_id)
+            LEFT JOIN pos_product_status s ON s.id=p.status_id
+            LEFT JOIN pos_category c ON c.id=p.category_id)
             LEFT JOIN pos_uom u ON u.id=p.product_uom ";
-
-?>
