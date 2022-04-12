@@ -68,6 +68,10 @@ $mnu = 'menu_product';
   include('win_category_new.php');
   include('win_category_modify.php');
 
+  include('win_payment_type_asearch.php');
+  include('win_payment_type_new.php');
+  include('win_payment_type_modify.php');
+
   include('win_user_changepass.php');
   include('loading.php');
   ?>
@@ -165,9 +169,11 @@ $mnu = 'menu_product';
                       <li id="2" role="presentation" class="tab_product"><a href="#receiving" aria-controls="receiving" role="tab" data-toggle="tab"><i class='fa fa-download fa-fw'></i>Receiving</a></li>
                       <li id="3" role="presentation" class="tab_product"><a href="#uom" aria-controls="uom" role="tab" data-toggle="tab"><i class='fa fa-random fa-fw'></i>UOM</a></li>
                       <li id="4" role="presentation" class="tab_product"><a href="#supplier" aria-controls="supplier" role="tab" data-toggle="tab"><i class='fa fa-truck fa-fw'></i>Supplier</a></li>
-                      <li id="5" role="presentation" class="tab_product"><a href="#buyer" aria-controls="buyer" role="tab" data-toggle="tab"><i class='fa fa-group fa-fw'></i>Buyer Type</a></li>
+                      <li id="5" role="presentation" class="tab_product"><a href="#buyer" aria-controls="buyer" role="tab" data-toggle="tab"><i class='fa fa-group fa-fw'></i>Buyer</a></li>
                       <li id="6" role="presentation" class="tab_product"><a href="#price" aria-controls="price" role="tab" data-toggle="tab"><i class='fa fa-tags fa-fw'></i>Pricing</a></li>
                       <li id="7" role="presentation" class="tab_product"><a href="#category" aria-controls="category" role="tab" data-toggle="tab"><i class='fa fa-list fa-fw'></i>Category</a></li>
+                      <li id="8" role="presentation" class="tab_product"><a href="#payment_type" aria-controls="payment_type" role="tab" data-toggle="tab"><i class='fa fa-thumbs-up fa-fw'></i>Payment</a></li>
+
                     </ul>
 
                     <!-- Tab panes -->
@@ -480,6 +486,39 @@ $mnu = 'menu_product';
                         </div>
                       </div>
 
+                      <div role="tabpanel" class="tab-pane" id="payment_type">
+                        <div class="card">
+                          <div class="card-body no-padding">
+                            <table id="tbl_payment_type_list" class="table table-bordered table-hover table-striped" cellspacing="0" width="100%" style="font: 90% Trebuchet MS !important; ">
+                              <thead>
+                                <tr>
+                                  <th>Option</th>
+                                  <th>Payment Type</th>
+                                  <th>Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td colspan='3'>Use Search Field Above to Show List</td>
+                                </tr>
+                                <?php
+                                /*
+                                    include('connect.php');
+                                    
+                                    include('query_payment_type.php');
+                                    $sql .= ' ORDER BY payment_type;';
+                                    
+                                    include('pop_payment_type.php');
+                                    
+                                    $mysqli->close();
+                                    */
+                                ?>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -524,6 +563,50 @@ $mnu = 'menu_product';
 
     $(document).on("click", ".tab_product", function(e) {
       tab_product = $(this).attr('id');
+    });
+
+    //btn_payment_type_asearch
+    //advance search payment_type
+    $(document).on('keypress', '.txt-payment_type-asearch', function(e) {
+      if (e.which == 13) {
+        $("#btn_payment_type_asearch").trigger('click');
+      }
+    });
+
+    $(document).on('click', '#btn_payment_type_asearch', function(e) {
+      e.preventDefault();
+      var payment_type = $("#txt_payment_type_asearch").val();
+      var status_id = $("#txt_payment_type_status_asearch").val();
+
+      $(".buttons_show, .error_show, .modal-body").css("display", "none");
+      $(".progress_show").css("display", "block");
+
+      $.post("db_payment_type.php", {
+        action: 6,
+        payment_type: payment_type,
+        status_id: status_id
+      }, function(data) {
+        $(".buttons_show, .modal-body").css("display", "block");
+        $(".progress_show, .error_show").css("display", "none");
+
+        if (data.indexOf("<!DOCTYPE html>") > -1) {
+          showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+          location.reload(true);
+        } else if (data.indexOf("Error: ") > -1) {
+          $(".error_show").css("display", "block");
+          $(".error_msg").text(data);
+          $("#txt_payment_type_asearch").select().focus();
+        } else {
+          $("#tbl_payment_type_list tbody").html(data);
+
+          $("#win_payment_type_asearch").modal('hide');
+
+          $('[data-toggle="tooltip"]').tooltip({
+            html: true
+          });
+        }
+      });
+
     });
 
     //btn_category_asearch
@@ -854,6 +937,15 @@ $mnu = 'menu_product';
           })
           break;
 
+        case 8: //PAYMENT_TYPE
+          $(".txt-payment_type-asearch").val("");
+          $("#win_payment_type_asearch").modal();
+
+          $('#win_payment_type_asearch').on('shown.bs.modal', function() {
+            $('#txt_payment_type_asearch').focus().select();
+          })
+          break;
+
 
         default:
           showError('Simple POS', "Error: Critical Error Encountered!");
@@ -1048,6 +1140,31 @@ $mnu = 'menu_product';
           });
           break;
 
+        case 8: //payment_type search
+          $("#loading").modal();
+
+          $.post("db_payment_type.php", {
+            action: 1,
+            mysearch: mysearch
+          }, function(data) {
+            $("#loading").modal('hide');
+
+            if (data.indexOf("<!DOCTYPE html>") > -1) {
+              showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+              location.reload(true);
+            } else if (data.indexOf("Error: ") > -1) {
+              showError('Simple POS', data);
+            } else {
+              $("#tbl_payment_type_list tbody").html(data);
+
+              $('[data-toggle="tooltip"]').tooltip({
+                html: true
+              });
+            }
+
+          });
+          break;
+
         default:
           showError('Simple POS', "Error: Critical Error Encountered!");
       }
@@ -1112,6 +1229,15 @@ $mnu = 'menu_product';
 
           $('#win_category_new').on('shown.bs.modal', function() {
             $('#txt_category').focus().select();
+          })
+          break;
+
+        case 8: //payment_type type          
+          $(".txt-payment_type").val("");
+          $("#win_payment_type_new").modal();
+
+          $('#win_payment_type_new').on('shown.bs.modal', function() {
+            $('#txt_payment_type').focus().select();
           })
           break;
 
@@ -2917,8 +3043,6 @@ $mnu = 'menu_product';
       $('#txt_category_update').focus().select();
     });
 
-
-
     //CATEGORY SAVE
     $(document).on('keypress', '.txt-category', function(e) {
       if (e.which == 13) {
@@ -3101,6 +3225,352 @@ $mnu = 'menu_product';
                   var tr_id = "tr_" + id;
 
                   $("#tbl_category_list tbody #" + tr_id).html(data).addClass('danger');
+
+                  $('[data-toggle="tooltip"]').tooltip({
+                    html: true
+                  });
+
+                  //reload pricing table
+                  $.post("db_price.php", {
+                    action: 1
+                  }, function(data) {
+                    if (data.indexOf("<!DOCTYPE html>") > -1) {
+                      showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                      location.reload(true);
+                    } else if (data.indexOf("Error: ") > -1) {
+                      $(".error_show").css("display", "block");
+                      $(".error_msg").text(data);
+                      location.reload();
+                    } else {
+                      $("#tbl_price_list").html(data);
+                      $('[data-toggle="tooltip"]').tooltip({
+                        html: true
+                      });
+
+                    }
+                  });
+
+                }
+              });
+            }
+          }
+        });
+      } else {
+        showError('Simple POS', 'Error: Critical Error Encountered!');
+      }
+    });
+
+
+
+    //PAYMENT_TYPE
+    //PAYMENT_TYPE MODIFY
+    $(document).on('keypress', '.txt-payment_type-update', function(e) {
+      if (e.which == 13) {
+        $("#btn_payment_type_update").trigger('click');
+      }
+    });
+
+    //payment_type save update
+    $(document).on('click', '#btn_payment_type_update', function(e) {
+      e.preventDefault();
+      var id = $('.hidden_payment_type_id').val();
+      var payment_type = $("#txt_payment_type_update").val();
+      var tr_id = "#tr_" + id;
+
+      if (id) {
+        if (payment_type) {
+
+          $(".buttons_show, .error_show, .modal-body").css("display", "none");
+          $(".progress_show").css("display", "block");
+
+          $.post("db_payment_type.php", {
+            action: 3,
+            id: id,
+            payment_type: payment_type
+          }, function(data) {
+            $(".buttons_show, .modal-body").css("display", "block");
+            $(".progress_show, .error_show").css("display", "none");
+
+            if (data.indexOf("<!DOCTYPE html>") > -1) {
+              showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+              location.reload(true);
+            } else if (data.indexOf("Error: ") > -1) {
+              $(".error_show").css("display", "block");
+              $(".error_msg").text(data);
+              $("#txt_payment_type_update").select().focus();
+            } else {
+              $("#tbl_payment_type_list tbody " + tr_id).html(data);
+
+              $("#win_payment_type_modify").modal('hide');
+
+              $('[data-toggle="tooltip"]').tooltip({
+                html: true
+              });
+
+              //reload pricing table
+              $.post("db_price.php", {
+                action: 1
+              }, function(data) {
+                if (data.indexOf("<!DOCTYPE html>") > -1) {
+                  showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                  location.reload(true);
+                } else if (data.indexOf("Error: ") > -1) {
+                  $(".error_show").css("display", "block");
+                  $(".error_msg").text(data);
+                  location.reload();
+                } else {
+                  $("#tbl_price_list").html(data);
+                  $('[data-toggle="tooltip"]').tooltip({
+                    html: true
+                  });
+
+                }
+              });
+
+            }
+          })
+
+        } else {
+          $(".error_show").css("display", "block");
+          $(".error_msg").text("Error: All fields are important!");
+          $("#txt_payment_type_update").select().focus();
+        }
+      } else {
+        $(".error_show").css("display", "block");
+        $(".error_msg").text("Error: Critical Error Encountered!");
+        $("#txt_payment_type_update").select().focus();
+      }
+    });
+
+    //payment_type show modify window
+    $(document).on('click', '.btn_payment_type_modify', function(e) {
+      e.preventDefault();
+      var id = $(this).attr('id');
+      if (id) {
+        //$("#loading").modal();
+        $(".buttons_show, .error_show, .modal-body").css("display", "none");
+        $(".progress_show").css("display", "block");
+
+        $("#win_payment_type_modify").modal();
+
+        $.post("db_payment_type.php", {
+          action: 4,
+          id: id
+        }, function(data) {
+          //$("#loading").modal('hide');         
+
+          if (data.indexOf("<!DOCTYPE html>") > -1) {
+            $("#win_payment_type_modify").modal('hide');
+
+            showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+            location.reload(true);
+          } else if (data.indexOf("Error: ") > -1) {
+            $("#win_payment_type_modify").modal('hide');
+
+            showError('Simple POS', data);
+          } else {
+            var payment_type = data;
+
+
+            $(".hidden_payment_type_id").val(id);
+            $("#txt_payment_type_update").val(payment_type);
+
+            $(".buttons_show, .modal-body").css("display", "block");
+            $(".progress_show, .error_show").css("display", "none");
+            //$("#win_payment_type_modify").modal();
+          }
+        });
+      } else {
+        showError('Simple POS', "Error: Critical Error Encountered!");
+      }
+    });
+
+    $('#win_payment_type_modify').on('shown.bs.modal', function() {
+      $('#txt_payment_type_update').focus().select();
+    });
+
+    //PAYMENT_TYPE SAVE
+    $(document).on('keypress', '.txt-payment_type', function(e) {
+      if (e.which == 13) {
+        $("#btn_payment_type_save").trigger('click');
+      }
+
+    });
+
+    $(document).on('click', '#btn_payment_type_save', function(e) {
+      e.preventDefault();
+      var payment_type = $("#txt_payment_type").val();
+
+      if (payment_type) {
+
+        $(".buttons_show, .error_show, .modal-body").css("display", "none");
+        $(".progress_show").css("display", "block");
+
+        $.post("db_payment_type.php", {
+          action: 2,
+          payment_type: payment_type
+        }, function(data) {
+          $(".buttons_show, .modal-body").css("display", "block");
+          $(".progress_show, .error_show").css("display", "none");
+
+          if (data.indexOf("<!DOCTYPE html>") > -1) {
+            showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+            location.reload(true);
+          } else if (data.indexOf("Error: ") > -1) {
+            $(".error_show").css("display", "block");
+            $(".error_msg").text(data);
+            $("#txt_payment_type").select().focus();
+          } else {
+            $("#tbl_payment_type_list tbody").html(data);
+
+            $("#win_payment_type_new").modal('hide');
+
+            $('[data-toggle="tooltip"]').tooltip({
+              html: true
+            });
+
+            //reload pricing table
+            $.post("db_price.php", {
+              action: 1
+            }, function(data) {
+              if (data.indexOf("<!DOCTYPE html>") > -1) {
+                showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                location.reload(true);
+              } else if (data.indexOf("Error: ") > -1) {
+                $(".error_show").css("display", "block");
+                $(".error_msg").text(data);
+                location.reload();
+              } else {
+                $("#tbl_price_list").html(data);
+                $('[data-toggle="tooltip"]').tooltip({
+                  html: true
+                });
+
+              }
+            });
+
+          }
+        })
+      } else {
+        $(".error_show").css("display", "block");
+        $(".error_msg").text("Error: All fields are important!");
+        $("#txt_payment_type").select().focus();
+      }
+    });
+
+    //payment_type activate
+    $(document).on('click', '.btn_payment_type_activate', function(e) {
+      e.preventDefault();
+      var id = $(this).attr('id');
+
+      var txt = "<div class='alert alert-warning role='alert'>";
+      txt += "  <strong><i class='fa fa-exclamation-triangle fa-2x'></i></strong> Are you sure you want to ACTIVATE this payment_type?";
+      txt += "</div>";
+
+      if (id) {
+        BootstrapDialog.confirm({
+          title: "<b style='color:grey;'>Simple POS </b>",
+          message: txt,
+          payment_type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+          closable: true, // <-- Default value is false
+          //draggable: true, // <-- Default value is false
+          //btnCancelLabel: 'Do not drop it!', // <-- Default value is 'Cancel',
+          btnOKLabel: 'Proceed', // <-- Default value is 'OK',
+          btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog payment_type will be used,
+          btnCancelClass: 'btn-warning', // <-- If you didn't specify it, dialog payment_type will be used,
+          autospin: true,
+          callback: function(result) {
+            // result will be true if button was click, while it will be false if users close the dialog directly.
+            if (result) {
+
+              $.post("db_payment_type.php", {
+                action: 7,
+                id: id,
+                status_id: 1
+              }, function(data) {
+                if (data.indexOf("<!DOCTYPE html>") > -1) {
+                  showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                  location.reload(true);
+                } else if (data.indexOf("Error: ") > -1) {
+                  showError('Simple POS', data);
+                } else {
+                  var tr_id = "tr_" + id;
+
+                  $("#tbl_payment_type_list tbody #" + tr_id).html(data).removeClass('danger');
+
+                  $('[data-toggle="tooltip"]').tooltip({
+                    html: true
+                  });
+
+                  //reload pricing table
+                  $.post("db_price.php", {
+                    action: 1
+                  }, function(data) {
+                    if (data.indexOf("<!DOCTYPE html>") > -1) {
+                      showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                      location.reload(true);
+                    } else if (data.indexOf("Error: ") > -1) {
+                      $(".error_show").css("display", "block");
+                      $(".error_msg").text(data);
+                      location.reload();
+                    } else {
+                      $("#tbl_price_list").html(data);
+                      $('[data-toggle="tooltip"]').tooltip({
+                        html: true
+                      });
+
+                    }
+                  });
+
+                }
+              });
+            }
+          }
+        });
+      } else {
+        showError('Simple POS', 'Error: Critical Error Encountered!');
+      }
+    });
+
+    //payment_type delete
+    $(document).on('click', '.btn_payment_type_delete', function(e) {
+      e.preventDefault();
+      var id = $(this).attr('id');
+
+      var txt = "<div class='alert alert-warning role='alert'>";
+      txt += "  <strong><i class='fa fa-exclamation-triangle fa-2x'></i></strong> Are you sure you want to MARK as Inactive this payment_type payment_type?";
+      txt += "</div>";
+
+      if (id) {
+        BootstrapDialog.confirm({
+          title: "<b style='color:grey;'>Simple POS </b>",
+          message: txt,
+          payment_type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+          closable: true, // <-- Default value is false
+          //draggable: true, // <-- Default value is false
+          //btnCancelLabel: 'Do not drop it!', // <-- Default value is 'Cancel',
+          btnOKLabel: 'Proceed', // <-- Default value is 'OK',
+          btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog payment_type will be used,
+          btnCancelClass: 'btn-warning', // <-- If you didn't specify it, dialog payment_type will be used,
+          autospin: true,
+          callback: function(result) {
+            // result will be true if button was click, while it will be false if users close the dialog directly.
+            if (result) {
+
+              $.post("db_payment_type.php", {
+                action: 7,
+                id: id,
+                status_id: 2
+              }, function(data) {
+                if (data.indexOf("<!DOCTYPE html>") > -1) {
+                  showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                  location.reload(true);
+                } else if (data.indexOf("Error: ") > -1) {
+                  showError('Simple POS', data);
+                } else {
+                  var tr_id = "tr_" + id;
+
+                  $("#tbl_payment_type_list tbody #" + tr_id).html(data).addClass('danger');
 
                   $('[data-toggle="tooltip"]').tooltip({
                     html: true
