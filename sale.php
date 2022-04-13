@@ -34,6 +34,7 @@ $mnu = 'menu_sale';
   include('win_sale_itemqty.php');
   include('win_sale_itemdiscount.php');
   include('win_sale_discount.php');
+  include('win_sale_payment.php');
   ?>
 
   <input type='hidden' id='hidden_subtotal' value='0.00' />
@@ -175,7 +176,9 @@ $mnu = 'menu_sale';
         <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
           <a class="card card-banner card-green-light">
             <div class="card-body">
-              <i class="icon fa-4x" style='font-style:normal !important;'><span class="sign">K</span></i>
+              <i class="icon fa-4x" style='font-style:normal !important;'>
+                <span class="sign"><?= trim($app_currency) ? strtoupper($app_currency[0]) : ""; ?></span>
+              </i>
               <div class="content">
                 <div class="title">Amount Due</div>
                 <div class="value">
@@ -193,7 +196,8 @@ $mnu = 'menu_sale';
                   SubTotal
                 </div>
                 <div class="col-sm-8 text-right">
-                  <span class="sign">K </span><span id='lbl_subtotal'>0.00</span>
+                  <span class="sign"><?= trim($app_currency) ? strtoupper($app_currency[0]) : ""; ?> </span>
+                  <span id='lbl_subtotal'>0.00</span>
                 </div>
               </div>
 
@@ -202,13 +206,15 @@ $mnu = 'menu_sale';
                   Discount
                 </div>
                 <div class="col-sm-8 text-right">
-                  <span class="sign">K </span><a class="value"><a href='#' id='lbl_discount' data-placement="left" data-toggle='tooltip' title="Click to update the value.">0.00</a>
+                  <span class="sign"><?= trim($app_currency) ? strtoupper($app_currency[0]) : ""; ?> </span>
+                  <a class="value"></a>
+                  <a href='#' id='lbl_discount' data-placement="left" data-toggle='tooltip' title="Click to update the value.">0.00</a>
                 </div>
               </div>
 
               <hr />
 
-              <div class="row">
+              <!-- <div class="row">
                 <div class="col-sm-4 text-right fa-2x">
                   Cash
                 </div>
@@ -226,11 +232,12 @@ $mnu = 'menu_sale';
                 </div>
               </div>
 
-              <hr />
+              <hr /> -->
 
               <div class="row">
                 <div class="col-sm-6">
-                  <button id='btn_sale_commit' class='btn btn-success btn-large' style="width: 100%"><i class='fa fa-check'></i> Commit</button>
+                  <button id='btn_sale_pay' class='btn btn-success btn-large' style="width: 100%"><i class='fa fa-check'></i> Pay</button>
+                  <!-- <button id='btn_sale_commit' class='btn btn-success btn-large' style="width: 100%"><i class='fa fa-check'></i> Commit</button> -->
                 </div>
                 <div class="col-sm-6">
                   <button id='btn_sale_cancel' class='btn btn-danger btn-large' style="width: 100%"><i class='fa fa-times'></i> Cancel</button>
@@ -374,7 +381,7 @@ $mnu = 'menu_sale';
         action: 10
       }, function(data) {
         if (data.indexOf("<!DOCTYPE html>") > -1) {
-          showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+          showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
           location.reload(true);
         } else if (data.indexOf("Error: ") > -1) {
           $("#lbl_sale_time").text("Disconnected");
@@ -402,7 +409,7 @@ $mnu = 'menu_sale';
         checkIfLock(function(isLock) {
           if (parseInt(isLock)) {
             if (currentLock == 0) {
-              showLock('Simple POS', 'This module is currently block by a supervisor!');
+              showLock('<?= $app_name; ?>', 'This module is currently block by a supervisor!');
             }
             currentLock = 1;
           } else {
@@ -424,10 +431,10 @@ $mnu = 'menu_sale';
         $("#loading").modal('hide');
 
         if (data.indexOf("<!DOCTYPE html>") > -1) {
-          showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+          showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
           location.reload(true);
         } else if (data.indexOf("Error: ") > -1) {
-          showError('Simple POS', data);
+          showError('<?= $app_name; ?>', data);
         } else {
           var count = parseInt(data);
 
@@ -438,7 +445,7 @@ $mnu = 'menu_sale';
 
 
             BootstrapDialog.confirm({
-              title: "<b style='color:grey;'>Simple POS </b>",
+              title: "<b style='color:grey;'><?= $app_name; ?> </b>",
               message: txt,
               type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
               closable: true, // <-- Default value is false
@@ -456,10 +463,10 @@ $mnu = 'menu_sale';
                     action: 3
                   }, function(data) {
                     if (data.indexOf("<!DOCTYPE html>") > -1) {
-                      showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                      showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
                       location.reload(true);
                     } else if (data.indexOf("Error: ") > -1) {
-                      showError('Simple POS', data);
+                      showError('<?= $app_name; ?>', data);
                     } else {
 
                       var lst = data.split(":~|~:")[0];
@@ -491,10 +498,10 @@ $mnu = 'menu_sale';
                     action: 4
                   }, function(data) {
                     if (data.indexOf("<!DOCTYPE html>") > -1) {
-                      showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                      showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
                       location.reload(true);
                     } else if (data.indexOf("Error: ") > -1) {
-                      showError('Simple POS', data);
+                      showError('<?= $app_name; ?>', data);
                     } else {
 
                       $('#txt_sale_additem').val('').focus();
@@ -514,59 +521,47 @@ $mnu = 'menu_sale';
 
       $('#txt_sale_additem').val('').focus();
 
+
     });
 
-    $(document).on('click', '.btn_sale_lock', function(e) {
+    $(document).on('click', '#btn_sale_pay', function(e) {
       e.preventDefault();
 
-      var txt = "<div class='alert alert-warning text-center' role='alert'>";
-      txt += "  <strong><i class='fa fa-question-circle fa-2x'></i></strong> Are you sure you want to lock the Sale Module?";
-      txt += "</div>";
+      $('#win_sale_payment').modal();
 
+      //$('#win_sale_payment').on('shown.bs.modal', function() {      
+      $("#payment_type_1").trigger("click"); //cash
+      //});
 
-      BootstrapDialog.confirm({
-        title: "<b style='color:grey;'>Simple POS </b>",
-        message: txt,
-        type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-        closable: true, // <-- Default value is false
-        //draggable: true, // <-- Default value is false
-        //btnCancelLabel: 'Do not drop it!', // <-- Default value is 'Cancel',
-        btnOKLabel: 'Lock', // <-- Default value is 'OK',
-        btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog type will be used,
-        btnCancelClass: 'btn-warning', // <-- If you didn't specify it, dialog type will be used,
-        autospin: true,
-        callback: function(result) {
-          // result will be true if button was click, while it will be false if users close the dialog directly.
-          if (result) { //load data from the temp db
-
-            $.post("db_sale.php", {
-              action: 12,
-              action_id: 1
-            }, function(data) {
-              if (data.indexOf("<!DOCTYPE html>") > -1) {
-                showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-                location.reload(true);
-              } else if (data.indexOf("Error: ") > -1) {
-                showError('Simple POS', data);
-              } else {
-
-              }
-
-            });
-          }
-        }
-      });
 
     });
 
-    $(document).on('keypress', '#txt_cash', function(e) {
-      if (e.which == 13) {
-        $('#btn_sale_commit').trigger('click');
+    $(document).on('click', '[name=radio_payment_type]', function(e) {
+      var payment_type_id = $(this).val();
+      var payment_type_label = $("#payment_type_label_" + payment_type_id).text().trim();
+
+      $("#txt_amount_due").val(Number($('#hidden_amountdue').val()).toFixed(2));
+
+      if (payment_type_label.toLocaleLowerCase() === "cash") {
+        $("#container_tender, #container_change, #btn_sale_save").show();
+        $("#container_reference").hide();
+        $("#txt_cash").val("0.00").select().focus();
+        $("#lbl_change").text("0.00");
+        $("#txt_reference").val("");
+      } else {
+        $("#container_reference, #btn_sale_save").show();
+        $("#container_tender, #container_change").hide();
+        $("#txt_reference").val("").select().focus();
+        $("#txt_cash").val($("#txt_amount_due").val());
+        $("#lbl_change").text("0.00");
       }
     });
 
-    $(document).on('click', '#btn_sale_commit', function(e) {
+    $(document).on('click', '#btn_sale_save', function(e) {
       e.preventDefault();
+
+      var payment_type_id = $("[name=radio_payment_type]:checked").val();
+      var payment_type_label = $("#payment_type_label_" + payment_type_id).text().trim();
 
       var subtotal = parseFloat($('#hidden_subtotal').val());
       var discount = parseFloat($('#hidden_discount').val());
@@ -574,12 +569,25 @@ $mnu = 'menu_sale';
       var discount_type = parseInt($('#hidden_discount_type').val());
       var amount_due = parseFloat($('#hidden_amountdue').val());
 
+      var reference = $('#txt_reference').val().trim();
       var cash = parseFloat($('#txt_cash').val());
       var remarks = $('#txt_sale_remarks').val();
       var change = cash - amount_due;
 
+      var proceed = false;
 
-      if (amount_due > 0.001 && cash >= amount_due) {
+      if (payment_type_label.toLocaleLowerCase() === "cash") {
+        if (amount_due > 0.001 && cash >= amount_due) {
+          proceed = true;
+        }
+      } else {
+        if (reference) {
+          proceed = true;
+        }
+      }
+
+      if (proceed) {
+        $("#win_sale_payment").hide();
         $("#loading").modal();
         $.post("db_sale.php", {
             action: 9,
@@ -590,18 +598,23 @@ $mnu = 'menu_sale';
             discount_type: discount_type,
             amount_due: amount_due,
             cash: cash,
-            change: change
+            change: change,
+            payment_type_id: payment_type_id,
+            payment_type_label: payment_type_label,
+            reference: reference
           },
           function(data) {
 
             $("#loading").modal('hide');
+            $("#win_sale_payment").show();
 
             if (data.indexOf("<!DOCTYPE html>") > -1) {
               alert("Error: Session Time-Out, You must login again to continue.");
               location.reload(true);
             } else if (data.indexOf("Error: ") > -1) {
-              showError("Simple POS", data);
+              showError("<?= $app_name; ?>", data);
             } else {
+              $('#win_sale_payment').modal('hide');
               $('#sale_receipt_no').text(data.split(':~|~:')[0]);
               $('#print_content').html(data.split(':~|~:')[1]);
               $('#print_total').html(data.split(':~|~:')[2]);
@@ -636,7 +649,7 @@ $mnu = 'menu_sale';
 
 
               BootstrapDialog.show({
-                title: "<b style='color:grey;'>Simple POS </b>",
+                title: "<b style='color:grey;'><?= $app_name; ?> </b>",
                 message: "<span class='alert alert-success'><i class='fa fa-check fa-2x fa-fw'></i>Transaction Completed, Press ENTER to continue.</span>",
                 buttons: [{
                   label: 'Continue',
@@ -654,10 +667,153 @@ $mnu = 'menu_sale';
 
           });
       } else {
-        showError("Simple POS", "Error: Invalid Amount Due or Cash is less than the amount due!");
+        showError("<?= $app_name; ?>", "Error: Invalid Amount Due, Cash or Reference");
       }
 
     });
+
+    $(document).on('click', '.btn_sale_lock', function(e) {
+      e.preventDefault();
+
+      var txt = "<div class='alert alert-warning text-center' role='alert'>";
+      txt += "  <strong><i class='fa fa-question-circle fa-2x'></i></strong> Are you sure you want to lock the Sale Module?";
+      txt += "</div>";
+
+
+      BootstrapDialog.confirm({
+        title: "<b style='color:grey;'><?= $app_name; ?> </b>",
+        message: txt,
+        type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+        closable: true, // <-- Default value is false
+        //draggable: true, // <-- Default value is false
+        //btnCancelLabel: 'Do not drop it!', // <-- Default value is 'Cancel',
+        btnOKLabel: 'Lock', // <-- Default value is 'OK',
+        btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog type will be used,
+        btnCancelClass: 'btn-warning', // <-- If you didn't specify it, dialog type will be used,
+        autospin: true,
+        callback: function(result) {
+          // result will be true if button was click, while it will be false if users close the dialog directly.
+          if (result) { //load data from the temp db
+
+            $.post("db_sale.php", {
+              action: 12,
+              action_id: 1
+            }, function(data) {
+              if (data.indexOf("<!DOCTYPE html>") > -1) {
+                showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
+                location.reload(true);
+              } else if (data.indexOf("Error: ") > -1) {
+                showError('<?= $app_name; ?>', data);
+              } else {
+
+              }
+
+            });
+          }
+        }
+      });
+
+    });
+
+    $(document).on('keypress', '#txt_cash', function(e) {
+      if (e.which == 13) {
+        $('#btn_sale_commit').trigger('click');
+      }
+    });
+
+    // $(document).on('click', '#btn_sale_commit', function(e) {
+    //   e.preventDefault();
+
+    //   var subtotal = parseFloat($('#hidden_subtotal').val());
+    //   var discount = parseFloat($('#hidden_discount').val());
+    //   var discount_qty = parseFloat($('#hidden_discount_qty').val());
+    //   var discount_type = parseInt($('#hidden_discount_type').val());
+    //   var amount_due = parseFloat($('#hidden_amountdue').val());
+
+    //   var cash = parseFloat($('#txt_cash').val());
+    //   var remarks = $('#txt_sale_remarks').val();
+    //   var change = cash - amount_due;
+
+
+    //   if (amount_due > 0.001 && cash >= amount_due) {
+    //     $("#loading").modal();
+    //     $.post("db_sale.php", {
+    //         action: 9,
+    //         subtotal: subtotal,
+    //         discount: discount,
+    //         discount_qty: discount_qty,
+    //         remarks: remarks,
+    //         discount_type: discount_type,
+    //         amount_due: amount_due,
+    //         cash: cash,
+    //         change: change
+    //       },
+    //       function(data) {
+
+    //         $("#loading").modal('hide');
+
+    //         if (data.indexOf("<!DOCTYPE html>") > -1) {
+    //           alert("Error: Session Time-Out, You must login again to continue.");
+    //           location.reload(true);
+    //         } else if (data.indexOf("Error: ") > -1) {
+    //           showError("<?= $app_name; ?>", data);
+    //         } else {
+    //           $('#sale_receipt_no').text(data.split(':~|~:')[0]);
+    //           $('#print_content').html(data.split(':~|~:')[1]);
+    //           $('#print_total').html(data.split(':~|~:')[2]);
+    //           $('#print').printThis();
+
+
+    //           var lst = data.split(":~|~:")[3];
+
+    //           $('#hidden_subtotal').val("0.00");
+    //           $('#lbl_subtotal').text("0.00");
+
+    //           $('#hidden_discount').val("0.00");
+    //           $('#lbl_discount').text("0.00");
+
+    //           $('#hidden_discount_qty').val("0.00");
+    //           $('#hidden_discount_type').val("0");
+
+    //           $('#hidden_amountdue').val("0.00");
+    //           $("#lbl_amountdue").text("0.00");
+
+    //           $('#txt_cash').val("0.00");
+    //           $('#lbl_change').text("0.00");
+    //           $('#txt_sale_remarks').val("");
+
+    //           $("#lbl_discount").attr("data-original-title", "");
+
+    //           $("#tbl_sale_itemlist tbody").html(lst);
+
+    //           $('[data-toggle="tooltip"]').tooltip({
+    //             html: true
+    //           });
+
+
+    //           BootstrapDialog.show({
+    //             title: "<b style='color:grey;'><?= $app_name; ?> </b>",
+    //             message: "<span class='alert alert-success'><i class='fa fa-check fa-2x fa-fw'></i>Transaction Completed, Press ENTER to continue.</span>",
+    //             buttons: [{
+    //               label: 'Continue',
+    //               hotkey: 13, // Enter key
+    //               cssClass: 'btn-success',
+    //               action: function(dialogRef) {
+    //                 dialogRef.close();
+    //                 $('#txt_sale_additem').val('').focus();
+    //               }
+    //             }]
+    //           });
+
+    //           $('#txt_sale_additem').val('').focus();
+    //         }
+
+    //       });
+    //   } else {
+    //     showError("<?= $app_name; ?>", "Error: Invalid Amount Due or Cash is less than the amount due!");
+    //   }
+
+    // });
 
 
     $(document).on('keypress', '#txt_sale_discount_value', function(e) {
@@ -923,11 +1079,11 @@ $mnu = 'menu_sale';
 
           if (data.indexOf("<!DOCTYPE html>") > -1) {
             $("#win_sale_itemqty").modal('hide');
-            showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+            showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
             location.reload(true);
           } else if (data.indexOf("Error: ") > -1) {
             $("#win_sale_itemqty").modal('hide');
-            showError('Simple POS', data);
+            showError('<?= $app_name; ?>', data);
           } else {
             var qty = data.split(":~|~:")[0];
             var uom = data.split(":~|~:")[1];
@@ -959,7 +1115,7 @@ $mnu = 'menu_sale';
         });
 
       } else {
-        showError("Simple POS", "Error: Critical Error Encountered!");
+        showError("<?= $app_name; ?>", "Error: Critical Error Encountered!");
       }
     });
 
@@ -1065,11 +1221,11 @@ $mnu = 'menu_sale';
 
           if (data.indexOf("<!DOCTYPE html>") > -1) {
             $("#win_sale_itemqty").modal('hide');
-            showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+            showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
             location.reload(true);
           } else if (data.indexOf("Error: ") > -1) {
             $("#win_sale_itemqty").modal('hide');
-            showError('Simple POS', data);
+            showError('<?= $app_name; ?>', data);
           } else {
             var qty = data.split(":~|~:")[0];
             var uom = data.split(":~|~:")[1];
@@ -1087,7 +1243,7 @@ $mnu = 'menu_sale';
         });
 
       } else {
-        showError("Simple POS", "Error: Critical Error Encountered!");
+        showError("<?= $app_name; ?>", "Error: Critical Error Encountered!");
       }
     });
 
@@ -1110,7 +1266,7 @@ $mnu = 'menu_sale';
 
 
       BootstrapDialog.confirm({
-        title: "<b style='color:grey;'>Simple POS </b>",
+        title: "<b style='color:grey;'><?= $app_name; ?> </b>",
         message: txt,
         type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
         closable: true, // <-- Default value is false
@@ -1127,10 +1283,10 @@ $mnu = 'menu_sale';
               action: 4
             }, function(data) {
               if (data.indexOf("<!DOCTYPE html>") > -1) {
-                showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
                 location.reload(true);
               } else if (data.indexOf("Error: ") > -1) {
-                showError('Simple POS', data);
+                showError('<?= $app_name; ?>', data);
               } else {
                 var lst = data.split(":~|~:")[0];
                 var all_total = data.split(":~|~:")[1];
@@ -1176,7 +1332,7 @@ $mnu = 'menu_sale';
 
 
         BootstrapDialog.confirm({
-          title: "<b style='color:grey;'>Simple POS </b>",
+          title: "<b style='color:grey;'><?= $app_name; ?> </b>",
           message: txt,
           type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
           closable: true, // <-- Default value is false
@@ -1195,10 +1351,10 @@ $mnu = 'menu_sale';
                 id: id
               }, function(data) {
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
-                  showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+                  showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
                   location.reload(true);
                 } else if (data.indexOf("Error: ") > -1) {
-                  showError('Simple POS', data);
+                  showError('<?= $app_name; ?>', data);
                 } else {
 
                   var lst = data.split(":~|~:")[0];
@@ -1231,7 +1387,7 @@ $mnu = 'menu_sale';
           }
         });
       } else {
-        showError('Simple POS', 'Error: Critical Error Encountered!');
+        showError('<?= $app_name; ?>', 'Error: Critical Error Encountered!');
       }
       $('#txt_sale_additem').val('').focus();
     });
@@ -1291,10 +1447,10 @@ $mnu = 'menu_sale';
           $("#loading").modal('hide');
 
           if (data.indexOf("<!DOCTYPE html>") > -1) {
-            showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
+            showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
             location.reload(true);
           } else if (data.indexOf("Error: ") > -1) {
-            showError('Simple POS', data);
+            showError('<?= $app_name; ?>', data);
             $('#txt_sale_additem').focus().select();
           } else {
             $('#txt_sale_additem').val('').focus();
