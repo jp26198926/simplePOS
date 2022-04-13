@@ -26,6 +26,9 @@ if ($pop) {
         $cashier = strtoupper($row->cashier);
         $status = $row->status;
 
+        $payment_type = $row->payment_type;
+        $reference = $row->reference;
+
         $total = floatval($row->amount_due);
         $t_taxbase = $total / 1.1;
         $t_gst = $t_taxbase * 0.1;
@@ -69,7 +72,7 @@ if ($pop) {
                         <span title='TYPE: {$discount_type_word} ; VALUE: {$discount_qty}'>{$discount}</span>
                      </td>";
                 */
-
+        echo "<td>{$payment_type}</td>";
         echo "<td align='right'>{$amount_due}</td>";
         echo "<td align='right'>{$taxbase}</td>";
         echo "<td align='right'>{$gst}</td>";

@@ -1,16 +1,16 @@
 <?php
-    
+
 // Include the main    
-    include("validate.php");
-	include("config.php");
-    
-    if (!empty($_SESSION['transaction_sql']) || $_SESSION['transaction_sql']!=''){
-        $sql = $_SESSION['transaction_sql'];
-        
-        $output='';
-        $items='';
-        
-        /*
+include("validate.php");
+include("config.php");
+
+if (!empty($_SESSION['transaction_sql']) || $_SESSION['transaction_sql'] != '') {
+    $sql = $_SESSION['transaction_sql'];
+
+    $output = '';
+    $items = '';
+
+    /*
         $search_emp='';
         $search_covered='';        
         $search_dept='';
@@ -48,8 +48,8 @@
                             
                     </table>";
         */
-        
-        $signatory = "  <table>
+
+    $signatory = "  <table>
                             <tr>
                                 <td >Prepared By:</td>
                                 <td>&nbsp;</td>
@@ -86,10 +86,10 @@
                                 <td align=\"center\">Name & Sign | Date</td>
                             </tr>
                         </table>";
-                        
-        $_SESSION['signatory']=$signatory;
-        
-        $tbl_list = "   <table cellspacing=\"0\" cellpadding=\"1\" border=\"1\" >
+
+    $_SESSION['signatory'] = $signatory;
+
+    $tbl_list = "   <table cellspacing=\"0\" cellpadding=\"1\" border=\"1\" >
                             <tr align=\"center\" >                                
                                 <th  rowspan=\"1\" width=\"10%\" ><b>RECEIPT</b></th>
                                 <th  rowspan=\"1\" width=\"10%\" ><b>DATETIME</b></th>
@@ -98,16 +98,17 @@
                                 <th  rowspan=\"2\" width=\"10%\" ><b>SUBTOTAL</b></th>                              
                                 <th  colspan=\"3\" width=\"30%\" ><b>DISCOUNT</b></th>
                                 -->
-                                
+                                <th  rowspan=\"1\" width=\"10%\" ><b>PMT TYPE</b></th>
+                                <th  rowspan=\"1\" width=\"10%\" ><b>REFERENCE</b></th>
                                 <th  rowspan=\"1\" width=\"10%\" ><b>AMOUNT DUE</b></th>
                                 <th  rowspan=\"1\" width=\"10%\" ><b>TAX BASE</b></th>
                                 <th  rowspan=\"1\" width=\"10%\" ><b>GST</b></th>
                                 
-                                <th  rowspan=\"1\" width=\"18%\" ><b>CASHIER</b></th>
+                                <th  rowspan=\"1\" width=\"10%\" ><b>CASHIER</b></th>
                                 
-                                <th  rowspan=\"1\" width=\"20%\" ><b>REMARKS</b></th>
+                                <th  rowspan=\"1\" width=\"10%\" ><b>REMARKS</b></th>
                                 
-                                <th  rowspan=\"1\" width=\"12%\" ><b>STATUS</b></th>                                    
+                                <th  rowspan=\"1\" width=\"10%\" ><b>STATUS</b></th>                                    
                             </tr>
                             <!--
                             <tr align=\"center\" >
@@ -116,163 +117,166 @@
                                 <th width=\"8%\" >TOTAL</th>                                
                             </tr>
                             -->";
-                            
-            include ('connect.php');
-            
-            $pop = $mysqli->query($sql);
-            if ($pop){
-                $count = $pop->num_rows;
-                if ($count > 0){
-                    $grand_total = 0;
-                    
-                    $total_due = 0;
-                    $total_taxbase = 0;
-                    $total_gst = 0;
-                    
-                    while($row=$pop->fetch_object()){
-                        $id = $row->id;
-                        //$receipt = str_pad($row->id, 10,"0", STR_PAD_LEFT);
-                        $receipt = $row->receipt;
-                        $dt_receipt = $row->dt;
-                        $subtotal = number_format(floatval($row->subtotal) ,2 ,'.' ,',');
-                        $discount = number_format(floatval($row->discount) ,2 ,'.' ,',');
-                        $discount_type = $row->discount_type;
-                        $discount_type_word = $row->discount_type_word ? $row->discount_type_word : "No Discount";
-                        $discount_qty = number_format(floatval($row->discount_qty) ,2 ,'.' ,',');           
-                        $amount_due = number_format(floatval($row->amount_due) ,2 ,'.' ,',');
-                        $remarks = $row->remarks;
-                        $status_id = $row->status_id;
-                        $cashier = strtoupper($row->cashier);
-                        $status = $row->status;
-                        
-                        $total = floatval($row->amount_due);
-                        
-                        $t_taxbase = $total / 1.1;
-                        $t_gst = $t_taxbase * 0.1;
-                        
-                        $total_due += $total;
-                        $total_taxbase += $t_taxbase;
-                        $total_gst += $t_gst;
-                        
-                        $taxbase = number_format($t_taxbase,2,'.',',');
-                        $gst = number_format($t_gst,2,'.',',');
-                        
-                        $grand_total += $total;
-                        
-                        $tbl_list .=  "<tr align=\"center\" >";                              
-                        $tbl_list .=  "  <th>" . $receipt . "</th>";
-                        $tbl_list .=  "  <th>" . $dt_receipt . "</th>";
-                        
-                        /*
+
+    include('connect.php');
+
+    $pop = $mysqli->query($sql);
+    if ($pop) {
+        $count = $pop->num_rows;
+        if ($count > 0) {
+            $grand_total = 0;
+
+            $total_due = 0;
+            $total_taxbase = 0;
+            $total_gst = 0;
+
+            while ($row = $pop->fetch_object()) {
+                $id = $row->id;
+                //$receipt = str_pad($row->id, 10,"0", STR_PAD_LEFT);
+                $receipt = $row->receipt;
+                $dt_receipt = $row->dt;
+                $subtotal = number_format(floatval($row->subtotal), 2, '.', ',');
+                $discount = number_format(floatval($row->discount), 2, '.', ',');
+                $discount_type = $row->discount_type;
+                $discount_type_word = $row->discount_type_word ? $row->discount_type_word : "No Discount";
+                $discount_qty = number_format(floatval($row->discount_qty), 2, '.', ',');
+                $amount_due = number_format(floatval($row->amount_due), 2, '.', ',');
+                $remarks = $row->remarks;
+                $status_id = $row->status_id;
+                $cashier = strtoupper($row->cashier);
+                $status = $row->status;
+
+                $payment_type = $row->payment_type;
+                $reference = $row->reference;
+
+                $total = floatval($row->amount_due);
+
+                $t_taxbase = $total / 1.1;
+                $t_gst = $t_taxbase * 0.1;
+
+                $total_due += $total;
+                $total_taxbase += $t_taxbase;
+                $total_gst += $t_gst;
+
+                $taxbase = number_format($t_taxbase, 2, '.', ',');
+                $gst = number_format($t_gst, 2, '.', ',');
+
+                $grand_total += $total;
+
+                $tbl_list .=  "<tr align=\"center\" >";
+                $tbl_list .=  "  <th>" . $receipt . "</th>";
+                $tbl_list .=  "  <th>" . $dt_receipt . "</th>";
+
+                /*
                         $tbl_list .=  "  <th align=\"right\" >" . $subtotal . "</th>";                            
                         $tbl_list .=  "  <th>" . $discount_type_word . "</th>";
                         $tbl_list .=  "  <th align=\"right\" >" . $discount_qty . "</th>";
                         $tbl_list .=  "  <th align=\"right\" >" . $discount . "</th>";
                         */
-                        
-                        $tbl_list .=  "  <th align=\"right\" >" . $amount_due . "</th>";
-                        $tbl_list .=  "  <th align=\"right\" >" . $taxbase . "</th>";
-                        $tbl_list .=  "  <th align=\"right\" >" . $gst . "</th>";
-                        $tbl_list .=  "  <th>" . $cashier . "</th>";
-                        $tbl_list .=  "  <th>" . $remarks . "</th>";
-                        $tbl_list .=  "  <th>" . $status . "</th>";                                   
-                        $tbl_list .=  "</tr>";
-                    }
-                    
-                    $tbl_list .=  "<tr>
-                                        <td colspan=\"2\"><b>GRAND TOTAL</b></td>
-                                        <td align=\"right\"><b>" . number_format($grand_total,2,'.',',') . "</b></td>
-                                        <td align=\"right\"><b>" . number_format($total_taxbase,2,'.',',') . "</b></td>
-                                        <td align=\"right\"><b>" . number_format($total_gst,2,'.',',') . "</b></td>
-                                  </tr>";
-                }else{
-                    $tbl_list .= "<tr><td colspan=\"8\">No Record</td></tr>";
-                }
-            }else{
-                $tbl_list .= "<tr><td colspan=\"8\">" . $mysqli->error . "</td></tr>";
+                $tbl_list .=  "  <th>" . $payment_type . "</th>";
+                $tbl_list .=  "  <th>" . $reference . "</th>";
+                $tbl_list .=  "  <th align=\"right\" >" . $amount_due . "</th>";
+                $tbl_list .=  "  <th align=\"right\" >" . $taxbase . "</th>";
+                $tbl_list .=  "  <th align=\"right\" >" . $gst . "</th>";
+                $tbl_list .=  "  <th>" . $cashier . "</th>";
+                $tbl_list .=  "  <th>" . $remarks . "</th>";
+                $tbl_list .=  "  <th>" . $status . "</th>";
+                $tbl_list .=  "</tr>";
             }
-            
-            $tbl_list .= "</table>";
-            
-            $mysqli->close();
-            
-            
-            
-    }else{
-        echo "Error: Critical Error Encountered!";
-        exit;
+
+            $tbl_list .=  "<tr>
+                                        <td colspan=\"4\"><b>GRAND TOTAL</b></td>
+                                        <td align=\"right\"><b>" . number_format($grand_total, 2, '.', ',') . "</b></td>
+                                        <td align=\"right\"><b>" . number_format($total_taxbase, 2, '.', ',') . "</b></td>
+                                        <td align=\"right\"><b>" . number_format($total_gst, 2, '.', ',') . "</b></td>
+                                  </tr>";
+        } else {
+            $tbl_list .= "<tr><td colspan=\"8\">No Record</td></tr>";
+        }
+    } else {
+        $tbl_list .= "<tr><td colspan=\"8\">" . $mysqli->error . "</td></tr>";
     }
-    
-         
-    
-   
-               
-    
+
+    $tbl_list .= "</table>";
+
+    $mysqli->close();
+} else {
+    echo "Error: Critical Error Encountered!";
+    exit;
+}
+
+
+
+
+
+
 
 //TCPDF library (search for installation path).
 //require_once('/library/tcpdf/tcpdf.php');
 require_once dirname(__FILE__) . '/library/tcpdf/tcpdf.php';
 
 // Extend the TCPDF class to create custom Header and Footer
-class MYPDF extends TCPDF {
-	
-	public $logo_path="";
-	public $company="";
-	public $address="";
-	public $page_name="";
-	public $signatory="";
+class MYPDF extends TCPDF
+{
+
+    public $logo_path = "";
+    public $company = "";
+    public $address = "";
+    public $page_name = "";
+    public $signatory = "";
 
     //Page header
-    public function Header() {
+    public function Header()
+    {
         // Logo
         //$image_file = 'images/png80.png';
-		if ($this->logo_path){ //if value has been supplied then 
-			$image_file = $this->logo_path;
-			$this->Image($image_file, 15,4, 14,'', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-		}		
-		
+        if ($this->logo_path) { //if value has been supplied then 
+            $image_file = $this->logo_path;
+            $this->Image($image_file, 15, 4, 14, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        }
+
         // Set font        
-        $this->SetFont('helvetica', 'R', 12);  
-		$this->MultiCell(100,10,$this->company,0,'L',false,0,30,6,false,0,false,true,0,'T',false);
+        $this->SetFont('helvetica', 'R', 12);
+        $this->MultiCell(100, 10, $this->company, 0, 'L', false, 0, 30, 6, false, 0, false, true, 0, 'T', false);
         //$this->MultiCell(50,10,"Frabelle PNG Ltd.",0,'L',false,0,30,6,false,0,false,true,0,'T',false);
-        
-        $this->SetFont('helvetica', 'R', 8);     
-		$this->MultiCell(50,10,$this->address,0,'L',false,0,30,8,false,0,false,true,0,'T',false);
+
+        $this->SetFont('helvetica', 'R', 8);
+        $this->MultiCell(50, 10, $this->address, 0, 'L', false, 0, 30, 8, false, 0, false, true, 0, 'T', false);
         //$this->MultiCell(50,10,"Lae City, Papua New Guinea",0,'L',false,0,30,7,false,0,false,true,0,'T',false);
-        
-        $this->SetFont('helvetica', 'B', 15);   
-		$this->Cell(0, 26, $this->page_name,0,1,'R', 0, '', 0, false, 'M', 'B');    
+
+        $this->SetFont('helvetica', 'B', 15);
+        $this->Cell(0, 26, $this->page_name, 0, 1, 'R', 0, '', 0, false, 'M', 'B');
         //$this->Cell(0, 26, 'POS - PRODUCT SOLD',0,1,'R', 0, '', 0, false, 'M', 'B');        
-        $this->writeHTML("<hr />",true,false,true,false,'');
+        $this->writeHTML("<hr />", true, false, true, false, '');
     }
 
     // Page footer
-    public function Footer() {
-         // Position at 15 mm from bottom
+    public function Footer()
+    {
+        // Position at 15 mm from bottom
         $this->SetY(-35);
         // Set font
         $this->SetFont('helvetica', 'I', 8);
         // Page number
-        $signatory=$_SESSION['signatory'];
+        $signatory = $_SESSION['signatory'];
         //$this->writeHTML($signatory,true,true);
-		$this->writeHTML($this->signatory,true,true);
-        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages() , 0, false, 'C', 0, '', 0, false, 'T', 'M');
-        
+        $this->writeHTML($this->signatory, true, true);
+        $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+
         $preparedby = $_SESSION['ufullname'];
         //$rep = $_SESSION['rep'];        
-        
-    }    
-    
+
+    }
 }
 
 // create new PDF document
 //$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
-$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'A4', true, 'UTF-8', false);
 
 $pdf->logo_path = $logo_path;
 $pdf->company = $company;
 $pdf->address = $address;
-$pdf->page_name="POS - TRANSACTION";
+$pdf->page_name = "POS - TRANSACTION";
 $pdf->signatory = $signatory;
 
 
@@ -289,8 +293,8 @@ $pdf->SetKeywords('DOWNLOAD, PDF');
 
 
 // set header and footer fonts
-$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
 // set default monospaced font
 $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -308,8 +312,8 @@ $pdf->SetAutoPageBreak(true, 40);
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
 // set some language-dependent strings (optional)
-if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
-    require_once(dirname(__FILE__).'/lang/eng.php');
+if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
+    require_once(dirname(__FILE__) . '/lang/eng.php');
     $pdf->setLanguageArray($l);
 }
 
@@ -319,7 +323,7 @@ if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
 $pdf->SetFont('helvetica', 'B', 15);
 
 // add a page
-$pdf->AddPage('P','A4');
+$pdf->AddPage('L', 'A4');
 
 
 //$pdf->SetFont('helvetica', '', 11);
@@ -337,7 +341,7 @@ $pdf->writeHTML($tbl_list, true, false, false, false, '');
 
 
 
-$filename = "POS". date('Ymd His') . ".PDF";
+$filename = "POS" . date('Ymd His') . ".PDF";
 //Close and output PDF document
 $pdf->Output($filename, 'I');
 

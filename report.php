@@ -211,6 +211,7 @@ $mnu = 'menu_report';
                                     <th>Sub-Total</th>                                    
                                     <th>Discount</th>
                                     -->
+                                  <th>Payment Type</th>
                                   <th>Amount Due</th>
                                   <th>Tax Base</th>
                                   <th>GST</th>
