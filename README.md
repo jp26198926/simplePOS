@@ -21,9 +21,10 @@ Demo Passsword: password
 3. Open your PhpMyAdmin and import the sample database at 'database/2022-04-14 sample data.sql'.
 4. Modify connect.php to match with your existing MySQL / Mariadb credential.
 5. Modify config.php to change the Company names and other settings.
+6. Open http://localhost/simplePOS in your browser.
 
 # Test the application
-1. goto http://localhost/simplePOS
+1. goto https://www.nosystems.online/project/pos
 2. Enter credentials below:
 - Demo Username: admin
 - Demo Passsword: password
