@@ -89,7 +89,7 @@ $mnu = 'menu_sale';
                 <label id="lbl_sale_time" class=" alert alert-success"></label>
               </li>
 
-              <li class="dropdown notification danger">
+              <!-- <li class="dropdown notification danger">
                 <a class="btn_sale_lock dropdown-toggle" data-toggle="dropdown">
                   <div class="icon"><i class="fa fa-lock" aria-hidden="true"></i></div>
                   <div class="title">Prevent the cashier from selling of product</div>
@@ -100,7 +100,7 @@ $mnu = 'menu_sale';
                     <li class="btn_sale_lock dropdown-empty">Prevent the cashier from selling of product</li>
                   </ul>
                 </div>
-              </li>
+              </li> -->
 
               <?php include('profile.php'); ?>
             </ul>
