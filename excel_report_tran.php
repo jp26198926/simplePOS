@@ -144,8 +144,10 @@ if ($sql) {
 
                 $total = floatval($row->amount_due);
 
-                $t_taxbase = $total / 1.1;
-                $t_gst = $t_taxbase * 0.1;
+                // $t_taxbase = $total / 1.1;
+                // $t_gst = $t_taxbase * 0.1;
+                $t_gst = $total * (floatval($gst_percent) / 100);
+                $t_taxbase = $total - $t_gst;
 
                 $total_due += $total;
                 $total_taxbase += $t_taxbase;
