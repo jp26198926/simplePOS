@@ -1,6 +1,7 @@
 <?php
 include('validate.php');
 include('connect.php');
+include('config.php');
 
 $action = $_POST['action'];
 
@@ -239,6 +240,8 @@ switch ($action) {
 
         $receipt_prefix = date('y');
         $receipt_no = $receipt_prefix . '00000000';
+		
+		$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
 
         if ($amount_due > 0.001 && $cash >= $amount_due) {
             //save tran
@@ -337,6 +340,9 @@ switch ($action) {
                     echo "<tr>";
                     echo "   <td align='right'>CHANGE</td>";
                     echo "   <td align='right'>" . number_format($change, 2, '.', ',') . "</td>";
+                    echo "</tr>";
+					echo "   <td align='right'>GST ({$gst_percent} %)</td>";
+                    echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
                     echo "</tr>";
                     echo "<tr>";
                     echo "   <td align='right'>PMT TYPE</td>";

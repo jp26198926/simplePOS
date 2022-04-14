@@ -1,6 +1,7 @@
 <?php
     include('validate.php');
     include('connect.php');
+	include('config.php');
         
     $action = $_POST['action'];
     
@@ -223,9 +224,12 @@
                
                 $sql = "SELECT t.dt as dt, CONCAT(DATE_FORMAT(t.dt, '%y'),LPAD(t.id,8,'0')) as receipt, t.subtotal as subtotal, t.discount_total as discount, t.total as amount_due, t.tran_cash as cash,
                                 t.tran_change as tran_change,
-                                CONCAT(c.fname, ' ', SUBSTR(c.lname,1,1)) as cashier 
+                                CONCAT(c.fname, ' ', SUBSTR(c.lname,1,1)) as cashier,
+								t.reference,
+								pt.payment_type
                         FROM pos_transaction t
                         LEFT JOIN pos_user c ON c.id=t.user_id
+						LEFT JOIN pos_payment_type pt ON pt.id=t.payment_type_id
                         WHERE t.id={$tran_id};";                               
                         
                 $exec = $mysqli->query($sql);
@@ -245,6 +249,10 @@
                         $change = $row->tran_change;
                         $receipt_no = $row->receipt;
                         $cashier = strtoupper($row->cashier);
+						$payment_type_label = $row->payment_type;
+						$reference = $row->reference;
+						
+						$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
                         
                         echo $receipt_no . ":~|~:" . $cashier . ":~|~:" . $tran_dt . ":~|~:"  ;
                         
@@ -298,13 +306,25 @@
                         echo "   <td align='right'><b>" . number_format($amount_due,2,'.',',') . "</b></td>";
                         echo "</tr>";
                         echo "<tr>";
-                        echo "   <td align='right'>CASH</td>";
+                        echo "   <td align='right'>TENDER</td>";
                         echo "   <td align='right'>" . number_format($cash,2,'.',',') . "</td>";
                         echo "</tr>";
                         echo "<tr>";
                         echo "   <td align='right'>CHANGE</td>";
                         echo "   <td align='right'>" . number_format($change,2,'.',',') . "</td>";
-                        echo "</tr>";                        
+                        echo "</tr>";  
+						echo "</tr>";
+						echo "   <td align='right'>GST ({$gst_percent} %)</td>";
+						echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						echo "   <td align='right'>PMT TYPE</td>";
+						echo "   <td align='right'>" . $payment_type_label . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						echo "   <td align='right'>PMT REF</td>";
+						echo "   <td align='right'>" . $reference . "</td>";
+						echo "</tr>";
                         
                     }else{
                         echo "Error: Critical Error Encountered!";
