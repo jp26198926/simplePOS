@@ -117,7 +117,7 @@
             }
             break;
         
-        case 4: //transactioin details
+        case 4: //transaction details
             $tran_id = $_POST['id'];            
             
             if ($tran_id){
@@ -125,6 +125,9 @@
                
                 $sql = "SELECT  t.dt as dt, CONCAT(DATE_FORMAT(t.dt, '%y'),LPAD(t.id,8,'0')) as receipt, t.subtotal as subtotal, t.discount_type as discount_type, t.discount_total as discount, t.discount_qty as discount_qty,
                                 t.total as amount_due, t.tran_cash as cash, t.tran_change as tran_change, t.remarks as remarks,
+                                t.gst_percent,
+                                t.gst_value,
+                                t.tax_base,
                                 d.discount_type as discount_type_name,
                                 CONCAT(u.lname,', ',u.fname,' ',u.mname) as cashier,
                                 s.status as status
@@ -226,7 +229,10 @@
                                 t.tran_change as tran_change,
                                 CONCAT(c.fname, ' ', SUBSTR(c.lname,1,1)) as cashier,
 								t.reference,
-								pt.payment_type
+								pt.payment_type,
+                                gst_percent,
+                                gst_value,
+                                tax_base
                         FROM pos_transaction t
                         LEFT JOIN pos_user c ON c.id=t.user_id
 						LEFT JOIN pos_payment_type pt ON pt.id=t.payment_type_id
@@ -251,8 +257,16 @@
                         $cashier = strtoupper($row->cashier);
 						$payment_type_label = $row->payment_type;
 						$reference = $row->reference;
+                        $gst_percent = $row->gst_percent;
+                        $gst_value = $row->gst_value;
+                        $tax_base = $row->tax_base;
 						
-						$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
+                        // $gst = floatval($gst_percent/100);
+                        // $divisor = 1 + $gst;
+                        // $tax_base = floatval($amount_due) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
+                        // $gst_value = $tax_base * $gst;
+
+						//$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
                         
                         echo $receipt_no . ":~|~:" . $cashier . ":~|~:" . $tran_dt . ":~|~:"  ;
                         
@@ -313,10 +327,22 @@
                         echo "   <td align='right'>CHANGE</td>";
                         echo "   <td align='right'>" . number_format($change,2,'.',',') . "</td>";
                         echo "</tr>";  
-						echo "</tr>";
-						echo "   <td align='right'>GST ({$gst_percent} %)</td>";
-						echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
-						echo "</tr>";
+
+                        if ($show_gst){
+                            echo "<tr>";
+                            echo "  <td></td>";
+                            echo "  <td><hr/></td>";
+                            echo "</tr>";
+                            echo "<tr>";
+                            echo "   <td align='right'>TAX BASE</td>";
+                            echo "   <td align='right'>" . number_format($tax_base, 2, '.', ',') . "</td>";
+                            echo "</tr>";
+                            echo "</tr>";
+                            echo "   <td align='right'>GST ({$gst_percent} %)</td>";
+                            echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
+                            echo "</tr>";
+                        }
+
 						echo "<tr>";
 						echo "   <td align='right'>PMT TYPE</td>";
 						echo "   <td align='right'>" . $payment_type_label . "</td>";

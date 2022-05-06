@@ -241,12 +241,25 @@ switch ($action) {
         $receipt_prefix = date('y');
         $receipt_no = $receipt_prefix . '00000000';
 		
-		$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
+        $gst = floatval($gst_percent/100);
+        $divisor = 1 + $gst;
+        $tax_base = floatval($amount_due) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
+		$gst_value = $tax_base * $gst;
+        //$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
 
         if ($amount_due > 0.001 && $cash >= $amount_due) {
             //save tran
-            $sql = "INSERT INTO pos_transaction (dt,subtotal,discount_total,discount_type,discount_qty,total,tran_cash,tran_change, payment_type_id, `reference`, user_id,remarks)
-                        VALUES ('{$dt}',{$subtotal},{$discount},{$discount_type},{$discount_qty},{$amount_due},{$cash},{$change},{$payment_type_id}, '{$reference}',{$uid},'{$remarks}');";
+            $sql = "INSERT INTO pos_transaction (
+                                                    dt,subtotal,discount_total,discount_type,discount_qty,
+                                                    total,tran_cash,tran_change, payment_type_id, 
+                                                    `reference`, user_id,remarks, gst_percent, gst_value, tax_base
+                                                )
+                        VALUES (
+                                    '{$dt}',{$subtotal},{$discount},{$discount_type},
+                                    {$discount_qty},{$amount_due},{$cash},{$change},
+                                    {$payment_type_id}, '{$reference}',{$uid},'{$remarks}',
+                                    {$gst_percent}, {$gst_value}, {$tax_base}
+                                );";
 
             $exec = $mysqli->query($sql);
             if ($exec) {
@@ -260,8 +273,8 @@ switch ($action) {
                 $trail_save = $mysqli->query($trail_query);
                 //end of Transaction Trail
 
-                $sql = "INSERT INTO pos_sale (dt,tran_id,product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total)
-                            SELECT '{$dt}',{$tran_id},product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total
+                $sql = "INSERT INTO pos_sale (dt,tran_id,product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,gst_percent,gst_value,tax_base)
+                            SELECT '{$dt}',{$tran_id},product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,{$gst_percent},((total/{$divisor})*{$gst}), (total/{$divisor})
                             FROM pos_sale_temp;";
 
                 $exec = $mysqli->query($sql);
@@ -341,9 +354,22 @@ switch ($action) {
                     echo "   <td align='right'>CHANGE</td>";
                     echo "   <td align='right'>" . number_format($change, 2, '.', ',') . "</td>";
                     echo "</tr>";
-					echo "   <td align='right'>GST ({$gst_percent} %)</td>";
-                    echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
-                    echo "</tr>";
+
+                    if ($show_gst){
+                        echo "<tr>";
+                        echo "  <td></td>";
+                        echo "  <td><hr/></td>";
+                        echo "</tr>";
+                        echo "<tr>";
+                        echo "   <td align='right'>TAX BASE</td>";
+                        echo "   <td align='right'>" . number_format($tax_base, 2, '.', ',') . "</td>";
+                        echo "</tr>";
+                        echo "<tr>";
+                        echo "   <td align='right'>GST ({$gst_percent} %)</td>";
+                        echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
+                        echo "</tr>";
+                    }
+
                     echo "<tr>";
                     echo "   <td align='right'>PMT TYPE</td>";
                     echo "   <td align='right'>" . $payment_type_label . "</td>";

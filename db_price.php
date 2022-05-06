@@ -283,8 +283,7 @@
             $result .=  "</thead>";
             $result .=  "<tbody>";
                                     
-            $sql = "SELECT
-                            p.id as id, p.product_code as code, p.product_name as product
+            $sql = "SELECT p.id as id, p.product_code as code, p.product_name as product
                     FROM pos_product p ";
            
             if ($search && $search != ""){

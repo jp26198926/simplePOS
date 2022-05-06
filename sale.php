@@ -1252,7 +1252,7 @@ $mnu = 'menu_sale';
       var cash = parseFloat($('#txt_cash').val());
       var due = parseFloat($('#hidden_amountdue').val());
 
-      var change = cash - due;
+      var change = (cash - due).toFixed(2); //round off to nearest 2 decimal places
 
       $('#lbl_change').text(change);
 

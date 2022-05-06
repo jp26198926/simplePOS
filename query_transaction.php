@@ -6,7 +6,10 @@ $sql = "SELECT t.id as id, t.dt as dt, t.subtotal as subtotal, CONCAT(DATE_FORMA
                     d.discount_type as discount_type_word,
                     CONCAT(u.lname,', ',u.fname,' ',u.mname) as cashier,
                     s.status as status,
-                    t.reference, pt.payment_type
+                    t.reference, pt.payment_type,
+                    t.gst_percent,
+                    t.gst_value,
+                    t.tax_base
             FROM ((((pos_transaction t
             LEFT JOIN pos_transaction_discount d ON d.id=t.discount_type)
             LEFT JOIN pos_user u ON u.id=t.user_id)

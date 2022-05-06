@@ -3,9 +3,9 @@
 //database settings
 $database_host             = 'localhost';
 $database_username         = 'root';
-$database_password         = '';
+$database_password         = 'astalavista';
 $database_name             = 'pos';
-$database_port          = 3306; //default: 3306
+$database_port          = 3308; //default: 3306
 
 //open mysql connection
 $mysqli = new mysqli($database_host, $database_username, $database_password, $database_name, $database_port);

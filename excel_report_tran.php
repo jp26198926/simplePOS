@@ -144,17 +144,22 @@ if ($sql) {
 
                 $total = floatval($row->amount_due);
 
+                $gst_percent = $row->gst_percent;
+                $gst_value = $row->gst_value;
+                $tax_base = $row->tax_base;
+
+
                 // $t_taxbase = $total / 1.1;
                 // $t_gst = $t_taxbase * 0.1;
-                $t_gst = $total * (floatval($gst_percent) / 100);
-                $t_taxbase = $total - $t_gst;
+                // $t_gst = $total * (floatval($gst_percent) / 100);
+                // $t_taxbase = $total - $t_gst;
 
                 $total_due += $total;
-                $total_taxbase += $t_taxbase;
-                $total_gst += $t_gst;
+                $total_taxbase += $tax_base;
+                $total_gst += $gst_value;
 
-                $taxbase = number_format($t_taxbase, 2, '.', ',');
-                $gst = number_format($t_gst, 2, '.', ',');
+                $taxbase = number_format($tax_base, 2, '.', ',');
+                $gst = number_format($gst_value, 2, '.', ',');
 
                 $grand_total += $total;
 
