@@ -47,11 +47,13 @@
             $product_id = $_POST['id'];
             $qty = floatval(trim($_POST['qty'] . ''));
             $supplier = $_POST['supplier'];
+            $price = floatval(trim($_POST['price'] . ''));
+            $total = $qty * $price;
             
             if ($product_id && $supplier){
                 if ($qty > 0){
-                    $sql = "INSERT INTO pos_stock (dt, product_id, qty, supplier_id, received_by)
-                            VALUES ('{$dt}',{$product_id},{$qty},{$supplier},{$uid});";
+                    $sql = "INSERT INTO pos_stock (dt, product_id, qty, price, total, supplier_id, received_by)
+                            VALUES ('{$dt}',{$product_id},{$qty},{$price},{$total},{$supplier},{$uid});";
                                 
                     $exec = $mysqli->query($sql);
                         

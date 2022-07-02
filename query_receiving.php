@@ -1,6 +1,8 @@
 <?php
     
-    $sql = "SELECT  s.id as id, s.dt as dt, s.qty as qty, s.status_id,
+    $sql = "SELECT  s.id as id, s.dt as dt, s.qty as qty, 
+                    s.price, s.total,
+                    s.status_id,
                     p.product_code product_code, p.product_name product_name,               
                     u.uom as product_uom,
                     su.supplier as supplier,
