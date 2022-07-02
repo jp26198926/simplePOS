@@ -6,8 +6,6 @@ $sql = "SELECT SUM(s.qty) as qty,
                     SUM(IF(s.buyer_id=3,s.qty,0)) as qty_kitchen,
                     SUM(IF(s.buyer_id=4,s.qty,0)) as qty_sale,
                     
-                    s.current_price as price,
-                    
                     SUM(s.discount_total) as discount_total,
                     SUM(IF(s.buyer_id=1,s.discount_total,0)) as discount_insider,
                     SUM(IF(s.buyer_id=2,s.discount_total,0)) as discount_outsider,

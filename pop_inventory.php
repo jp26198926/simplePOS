@@ -18,6 +18,8 @@ if ($pop) {
 
             $current_balance = $stock - $sale;
 
+            $supplier_price = $row->supplier_price;
+
             $tr_id = "tr_" . $id;
 
             echo "<tr id='{$tr_id}'>";
@@ -26,12 +28,13 @@ if ($pop) {
             echo "   <td align='center'>{$uom}</td>";
             echo "   <td align='center'>{$category}</td>";
             echo "   <td align='center'>{$current_balance}</td>";
+            echo "   <td align='right'>{$supplier_price}</td>";
 
             echo "</tr>";
         }
     } else {
         echo "<tr>";
-        echo "   <td colspan='5' align='center'>No Record Found</td>";
+        echo "   <td colspan='6' align='center'>No Record Found</td>";
         echo "</tr>";
     }
 } else {

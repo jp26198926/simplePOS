@@ -6,6 +6,13 @@ $sql = "SELECT  p.id as id, p.product_code product_code, p.product_name product_
                     c.category,
                     s.status as status,
                     (
+                        select price
+                        from pos_stock
+                        where (product_id=p.id AND status_id=1) AND (dt <= '{$dt_ending}')
+                        order by id desc
+                        limit 1
+                    ) as supplier_price,
+                    (
                     	select sum(qty) 
                     	from pos_stock 
                     	where (product_id=p.id AND status_id=1) AND (dt <= '{$dt_ending}')

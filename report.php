@@ -397,16 +397,17 @@ $mnu = 'menu_report';
                                                             style="font: 90% Trebuchet MS; ">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>Product Code</th>
-                                                                    <th>Product Name</th>
+                                                                    <th>CODE</th>
+                                                                    <th>PRODUCT</th>
                                                                     <th>UOM</th>
-                                                                    <th>Category</th>
+                                                                    <th>CATEGORY</th>
                                                                     <th>CURRENT BALANCE</th>
+                                                                    <th>SUPPLIER PRICE</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td colspan="5" align="center">Use Advance Search
+                                                                    <td colspan="6" align="center">Use Advance Search
                                                                     </td>
                                                             </tbody>
                                                         </table>
