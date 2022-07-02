@@ -103,7 +103,7 @@
             $id = $_POST['id'];
             if ($id){
                                 
-                $sql = "SELECT  s.dt as dt, s.qty as qty, s.supplier_id as supplier,
+                $sql = "SELECT  s.dt as dt, s.qty as qty, s.price, s.total, s.supplier_id as supplier,
                                 p.product_code as product_code, p.product_name as product_name,
                                 u.uom as uom
                         FROM (pos_stock s
@@ -120,9 +120,11 @@
                     $product_name = $row->product_name;
                     $uom = $row->uom;
                     $qty = $row->qty;
+                    $price = $row->price;
+                    $total = $row->total;
                     $supplier = $row->supplier;
                                                 
-                    echo $dt . ":~|~:" . $product_code . ":~|~:" . $product_name . ":~|~:" . $uom . ":~|~:" . $qty . ":~|~:" . $supplier;
+                    echo $dt . ":~|~:" . $product_code . ":~|~:" . $product_name . ":~|~:" . $uom . ":~|~:" . $qty . ":~|~:" . $supplier . ":~|~:" . $price . ":~|~:" . $total;
                     
                 }else{
                     echo "Error: " . $mysqli->error;
@@ -137,10 +139,19 @@
             $id = $_POST['id'];
             $dt = $_POST['dt'];
             $qty = floatval(trim($_POST['qty']));
+            $price = floatval(trim($_POST['price'] . ''));
+            $total = $qty * $price;
             $supplier = $_POST['supplier'];
             
                     
-            $sql = "UPDATE pos_stock SET  dt='{$dt}', qty={$qty}, supplier_id={$supplier} WHERE id={$id};";
+            $sql = "UPDATE pos_stock 
+                    SET  
+                        dt='{$dt}', 
+                        qty={$qty}, 
+                        price={$price},
+                        total={$total},
+                        supplier_id={$supplier} 
+                    WHERE id={$id};";
             
             $exec = $mysqli->query($sql);
             if ($exec){

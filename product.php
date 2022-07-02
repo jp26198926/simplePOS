@@ -1390,6 +1390,8 @@ $mnu = 'menu_product';
                     var uom = data.split(":~|~:")[3];
                     var qty = data.split(":~|~:")[4];
                     var supplier = data.split(":~|~:")[5];
+                    var price = data.split(":~|~:")[6];
+                    var total = data.split(":~|~:")[7];
 
                     $(".hidden_receiving_id").val(id);
                     $("#txt_receiving_dt_update").val(dt);
@@ -1398,6 +1400,8 @@ $mnu = 'menu_product';
                     $("#txt_receiving_name_update").val(product_name);
                     $("#txt_receiving_uom_update").text(uom);
                     $("#txt_receiving_qty_update").val(qty);
+                    $("#txt_receiving_price_update").val(price);
+                    $("#txt_receiving_total_update").val(total);
                     $("#txt_receiving_supplier_update").val(supplier);
 
                     $(".buttons_show, .modal-body").css("display", "block");
@@ -1423,6 +1427,20 @@ $mnu = 'menu_product';
     });
 
     $(document).on('keyup', '#txt_receiving_qty, #txt_receiving_price', function() {
+        $(this).trigger('change');
+    });
+
+    $(document).on('change', '#txt_receiving_qty_update, #txt_receiving_price_update', function() {
+        var qty = Number($("#txt_receiving_qty_update").val()) ? Number($("#txt_receiving_qty_update").val()) :
+            0;
+        var price = Number($("#txt_receiving_price_update").val()) ? Number($("#txt_receiving_price_update")
+            .val()) : 0;
+        var total = qty * price;
+
+        $("#txt_receiving_total_update").val(total.toFixed(2));
+    });
+
+    $(document).on('keyup', '#txt_receiving_qty_update, #txt_receiving_price_update', function() {
         $(this).trigger('change');
     });
 
@@ -1706,6 +1724,7 @@ $mnu = 'menu_product';
         var id = $('.hidden_receiving_id').val();
         var dt = $("#txt_receiving_dt_update").val();
         var qty = parseFloat($("#txt_receiving_qty_update").val());
+        var price = parseFloat($("#txt_receiving_price_update").val());
         var supplier = $("#txt_receiving_supplier_update").val();
 
         if (id) {
@@ -1719,6 +1738,7 @@ $mnu = 'menu_product';
                     id: id,
                     dt: dt,
                     qty: qty,
+                    price: price,
                     supplier: supplier
                 }, function(data) {
                     $(".buttons_show, .modal-body").css("display", "block");
