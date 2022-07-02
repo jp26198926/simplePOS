@@ -30,6 +30,32 @@ if ($pop) {
             echo "   <td align='center'>{$current_balance}</td>";
             echo "   <td align='right'>{$supplier_price}</td>";
 
+            //get all prices from active buyer type
+            $price_sql = "SELECT pp.price as price
+                          FROM pos_price pp
+                          LEFT JOIN pos_buyer pb ON pb.id = pp.buyer_id AND pb.status_id = 1
+                          WHERE pp.product_id={$id} AND pb.status_id=1
+                          ORDER BY pb.type;";
+                                                          
+            $price_pop = $mysqli->query($price_sql);
+            
+            if ($price_pop){
+                $price_count = $price_pop->num_rows;
+                
+                if ($price_count > 0){
+                    while($price_row = $price_pop->fetch_object()){  
+                        $price_price = number_format($price_row->price,2,'.',',');
+                                                    
+                        echo "<td align='right'>{$price_price}</td>";
+                    }                            
+                }else{                    
+                    echo "<td align='center'>No Price Yet</td>";
+                }
+            }else{
+                echo  "<td align='center'>Error</td>";
+            }
+
+
             echo "</tr>";
         }
     } else {

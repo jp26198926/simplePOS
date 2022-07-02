@@ -395,19 +395,54 @@ $mnu = 'menu_report';
                                                             class="table table-sm table-bordered table-hover table-striped"
                                                             cellspacing="0" width="100%"
                                                             style="font: 90% Trebuchet MS; ">
+
+                                                            <?php
+                                                                include('connect.php');
+                                                                $buyer_list = array();
+
+                                                                $sql = "SELECT id, type FROM pos_buyer WHERE status_id=1 ORDER BY type;";
+                                                                $pop = $mysqli->query($sql);
+                                                                if ($pop) {
+                                                                    //$buyer_count = $pop->num_rows + 2;
+
+                                                                    while ($row = $pop->fetch_object()) {
+                                                                        //$buyer_id = $row->id;
+                                                                        $buyer_type = strtoupper($row->type . '');
+                                                                        //echo "<th>{$buyer_type}</th>";
+
+                                                                        array_push($buyer_list, $buyer_type);
+                                                                    }
+                                                                }
+
+                                                                $mysqli->close();
+                                                            ?>
+
+
                                                             <thead>
                                                                 <tr>
-                                                                    <th>CODE</th>
-                                                                    <th>PRODUCT</th>
-                                                                    <th>UOM</th>
-                                                                    <th>CATEGORY</th>
-                                                                    <th>CURRENT BALANCE</th>
-                                                                    <th>SUPPLIER PRICE</th>
+                                                                    <th rowspan="2">CODE</th>
+                                                                    <th rowspan="2">PRODUCT</th>
+                                                                    <th rowspan="2">UOM</th>
+                                                                    <th rowspan="2">CATEGORY</th>
+                                                                    <th rowspan="2">CURRENT BALANCE</th>
+                                                                    <th rowspan="2">SUPPLIER PRICE</th>
+                                                                    <th aling="center"
+                                                                        colspan="<?= count($buyer_list); ?>">
+                                                                        SELLING PRICE
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <?php
+                                                                        foreach ($buyer_list as $buyer){
+                                                                            echo "<th align='center'>" . $buyer . "</th>";
+                                                                        }
+                                                                    ?>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td colspan="6" align="center">Use Advance Search
+                                                                    <td colspan="<?= 6 + count($buyer_list); ?>"
+                                                                        align="center">Use Advance Search
                                                                     </td>
                                                             </tbody>
                                                         </table>

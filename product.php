@@ -298,17 +298,17 @@ $mnu = 'menu_product';
                                                                     </td>
                                                                 </tr>
                                                                 <?php
-                                /*
-                                    include('connect.php');
-                                    
-                                    include('query_uom.php');
-                                    $sql .= ' ORDER BY uom;';
-                                    
-                                    include('pop_uom.php');
-                                    
-                                    $mysqli->close();
-                                    */
-                                ?>
+                                                                /*
+                                                                    include('connect.php');
+                                                                    
+                                                                    include('query_uom.php');
+                                                                    $sql .= ' ORDER BY uom;';
+                                                                    
+                                                                    include('pop_uom.php');
+                                                                    
+                                                                    $mysqli->close();
+                                                                    */
+                                                                ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -335,17 +335,17 @@ $mnu = 'menu_product';
                                                                     </td>
                                                                 </tr>
                                                                 <?php
-                                /*
-                                    include('connect.php');
-                                    
-                                    include('query_supplier.php');
-                                    $sql .= ' ORDER BY supplier;';
-                                    
-                                    include('pop_supplier.php');
-                                    
-                                    $mysqli->close();
-                                    */
-                                ?>
+                                                                /*
+                                                                    include('connect.php');
+                                                                    
+                                                                    include('query_supplier.php');
+                                                                    $sql .= ' ORDER BY supplier;';
+                                                                    
+                                                                    include('pop_supplier.php');
+                                                                    
+                                                                    $mysqli->close();
+                                                                    */
+                                                                ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -372,17 +372,17 @@ $mnu = 'menu_product';
                                                                     </td>
                                                                 </tr>
                                                                 <?php
-                                /*
-                                    include('connect.php');
-                                    
-                                    include('query_buyer.php');
-                                    $sql .= ' ORDER BY buyer;';
-                                    
-                                    include('pop_buyer.php');
-                                    
-                                    $mysqli->close();
-                                    */
-                                ?>
+                                                                /*
+                                                                    include('connect.php');
+                                                                    
+                                                                    include('query_buyer.php');
+                                                                    $sql .= ' ORDER BY buyer;';
+                                                                    
+                                                                    include('pop_buyer.php');
+                                                                    
+                                                                    $mysqli->close();
+                                                                    */
+                                                                ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -397,96 +397,41 @@ $mnu = 'menu_product';
                                                             cellspacing="0" width="100%"
                                                             style="font: 90% Trebuchet MS !important; ">
                                                             <?php
-                              echo "<thead>";
+                                                                echo "<thead>";
 
-                              echo "  <tr>";
-                              echo "    <th>CODE</th>";
-                              echo "    <th>PRODUCT</th>";
+                                                                echo "  <tr>";
+                                                                echo "    <th>CODE</th>";
+                                                                echo "    <th>PRODUCT</th>";
 
-                              include('connect.php');
-                              $buyer_list = array();
+                                                                include('connect.php');
+                                                                $buyer_list = array();
 
-                              $sql = "SELECT id, type FROM pos_buyer WHERE status_id=1 ORDER BY type;";
-                              $pop = $mysqli->query($sql);
-                              if ($pop) {
-                                $buyer_count = $pop->num_rows + 2;
+                                                                $sql = "SELECT id, type FROM pos_buyer WHERE status_id=1 ORDER BY type;";
+                                                                $pop = $mysqli->query($sql);
+                                                                if ($pop) {
+                                                                    $buyer_count = $pop->num_rows + 2;
 
-                                while ($row = $pop->fetch_object()) {
-                                  $buyer_id = $row->id;
-                                  $buyer_type = strtoupper($row->type . '');
-                                  echo "<th>{$buyer_type}</th>";
+                                                                    while ($row = $pop->fetch_object()) {
+                                                                    $buyer_id = $row->id;
+                                                                    $buyer_type = strtoupper($row->type . '');
+                                                                    echo "<th>{$buyer_type}</th>";
 
-                                  array_push($buyer_list, $buyer_id);
-                                }
-                              }
+                                                                    array_push($buyer_list, $buyer_id);
+                                                                    }
+                                                                }
 
-                              echo "  </tr>";
+                                                                echo "  </tr>";
 
-                              echo "</thead>";
-                              echo "<tbody>";
+                                                                echo "</thead>";
+                                                                echo "<tbody>";
 
-                              echo "  <td colspan='{$buyer_count}'>Use Search Field Above to Show List</td>";
+                                                                echo "  <td colspan='{$buyer_count}'>Use Search Field Above to Show List</td>";
+                                                               
+                                                                $mysqli->close();
 
-                              /*
-                                    $sql = "SELECT
-                                                p.id as id, p.product_code as code, p.product_name as product
-                                            FROM pos_product p                                           
-                                            ORDER BY p.product_name;";
-                                    
-                                    $pop = $mysqli->query($sql);
-                                    if ($pop){
-                                      $prod_count = $pop->num_rows;
-                                      if ($prod_count > 0){
-                                        while($rowp = $pop->fetch_object()){
-                                          $p_id = $rowp->id;
-                                          $code = $rowp->code;
-                                          $product = $rowp->product;
-                                                                                    
-                                          echo "<tr>";
-                                          echo "<td>{$code}</td>";
-                                          echo "<td>{$product}</td>";
-                                          
-                                          foreach($buyer_list as  &$value){
-                                            $buyer_value = $value;
-                                            $price_sql = "SELECT i.id as price_id, i.price as price
-                                                          FROM pos_price i
-                                                          WHERE i.buyer_id={$buyer_value} AND i.product_id={$p_id};";
-                                                          
-                                            $price_pop = $mysqli->query($price_sql);
-                                            
-                                            if ($price_pop){
-                                              $price_count = $price_pop->num_rows;
-                                              if ($price_count > 0){
-                                                $price_row = $price_pop->fetch_object();
-                                                
-                                                $price_id = $price_row->price_id;
-                                                $price_price = number_format($price_row->price,2,'.',',');
-                                                 
-                                                echo "<td align='right'><a href='#' id='{$price_id}' class='price_modify'>{$price_price}</a></td>";
-                                                
-                                              }else{
-                                                $price_add_id = $p_id  . ":~|~:" . $buyer_value;
-                                                echo "<td align='center'><a href='#' id='{$price_add_id}' class='price_add'>Set Price</a></td>";
-                                              }
-                                            }else{
-                                              echo "<td align='center'>Error</td>";
-                                            }
-                                          }
-                                          
-                                          
-                                          echo "</tr>";
-                                        }
-                                      }else{
-                                        echo "<td colspan='{$buyer_count}'>No Product Found</td>";
-                                      }
-                                    }                                    
-                                    */
+                                                                echo "</tbody>";
 
-                              $mysqli->close();
-
-                              echo "</tbody>";
-
-                              ?>
+                                                                ?>
 
                                                         </table>
                                                     </div>
