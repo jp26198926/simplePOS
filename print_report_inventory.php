@@ -5,6 +5,25 @@ include("validate.php");
 include("config.php");
 
 if (!empty($_SESSION['inventory_sql']) || $_SESSION['inventory_sql'] != '') {
+
+    /* GET ACTIVE BUYER TYPES */
+    include('connect.php');
+    $buyer_list = array();
+    $sql = "SELECT id, type FROM pos_buyer WHERE status_id=1 ORDER BY type;";
+    $pop = $mysqli->query($sql);
+    
+    if ($pop) {
+        while ($row = $pop->fetch_object()) {
+            $buyer_type = strtoupper($row->type . '');
+            array_push($buyer_list, $buyer_type);
+        }
+    }
+
+    $mysqli->close();
+    $buyer_count = count($buyer_list);
+    $column_count = $buyer_count + 6;
+
+    /* GET SEARCHED SESSION */
     $sql = $_SESSION['inventory_sql'];
 
     $product = $_GET['product'] ? $_GET['product'] : "All";
@@ -64,14 +83,23 @@ if (!empty($_SESSION['inventory_sql']) || $_SESSION['inventory_sql'] != '') {
     $_SESSION['signatory'] = $signatory;
 
     $tbl_list = "   <table cellspacing=\"0\" cellpadding=\"2\" border=\"1\" >
+                        <thead>    
                             <tr align=\"center\" >                                
-                                <th><b>Product Code</b></th>
-                                <th><b>Product Name</b></th>                                    
-                                <th><b>UOM</b></th>
-                                <th><b>CATEGORY</b></th>
-                                <th><b>STOCK</b></th>                                 
+                                <th rowspan=\"2\"><b>CODE</b></th>
+                                <th rowspan=\"2\"><b>PRODUCT</b></th>                                    
+                                <th rowspan=\"2\"><b>UOM</b></th>
+                                <th rowspan=\"2\"><b>CATEGORY</b></th>
+                                <th rowspan=\"2\"><b>STOCK</b></th> 
+                                <th rowspan=\"2\"><b>SUPPLIER PRICE</b></th> 
+                                <th colspan=\"{$buyer_count}\"><b>SELLING PRICE</b></th>                               
                             </tr>
-                            ";
+                            <tr>";
+    foreach ($buyer_list as $buyer){
+       $tbl_list .= "           <th><b>" . $buyer . "</b></th>";
+    }
+
+    $tbl_list .= "           </tr>
+                        </thead>";
 
     include('connect.php');
 
@@ -94,6 +122,8 @@ if (!empty($_SESSION['inventory_sql']) || $_SESSION['inventory_sql'] != '') {
 
                 $current_balance = $stock - $sale;
 
+                $supplier_price = $row->supplier_price;
+
                 $tr_id = "tr_" . $id;
 
                 $tbl_list .= "<tr id='{$tr_id}'>";
@@ -102,16 +132,42 @@ if (!empty($_SESSION['inventory_sql']) || $_SESSION['inventory_sql'] != '') {
                 $tbl_list .= "   <td align=\"center\">{$uom}</td>";
                 $tbl_list .= "   <td align=\"center\">{$category}</td>";
                 $tbl_list .= "   <td align=\"center\">{$current_balance}</td>";
+                $tbl_list .= "   <td align=\"right\">{$supplier_price}</td>";
+
+                //get all prices from active buyer type
+                $price_sql = "SELECT pp.price as price
+                            FROM pos_price pp
+                            LEFT JOIN pos_buyer pb ON pb.id = pp.buyer_id AND pb.status_id = 1
+                            WHERE pp.product_id={$id} AND pb.status_id=1
+                            ORDER BY pb.type;";
+                                                            
+                $price_pop = $mysqli->query($price_sql);
+                
+                if ($price_pop){
+                    $price_count = $price_pop->num_rows;
+                    
+                    if ($price_count > 0){
+                        while($price_row = $price_pop->fetch_object()){  
+                            $price_price = number_format($price_row->price,2,'.',',');
+                                                        
+                            $tbl_list .= "<td align=\"right\">{$price_price}</td>";
+                        }                            
+                    }else{                    
+                        $tbl_list .= "<td colspan=\"{$buyer_count}\" align=\"center\">No Price Yet</td>";
+                    }
+                }else{
+                    $tbl_list .=  "<td colspan=\"{$buyer_count}\" align=\"center\">Error</td>";
+                }
 
                 $tbl_list .= "</tr>";
             }
         } else {
             $tbl_list .= "<tr>";
-            $tbl_list .= "   <td colspan=\"7\" align=\"center\">No Record Found</td>";
+            $tbl_list .= "   <td colspan=\"{$column_count}\" align=\"center\">No Record Found</td>";
             $tbl_list .= "</tr>";
         }
     } else {
-        $tbl_list .= "<tr><td colspan=\"7\">" . $mysqli->error . "</td></tr>";
+        $tbl_list .= "<tr><td colspan=\"{$column_count}\">" . $mysqli->error . "</td></tr>";
     }
 
     $tbl_list .= "</table>";

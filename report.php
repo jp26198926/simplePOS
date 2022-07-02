@@ -403,20 +403,14 @@ $mnu = 'menu_report';
                                                                 $sql = "SELECT id, type FROM pos_buyer WHERE status_id=1 ORDER BY type;";
                                                                 $pop = $mysqli->query($sql);
                                                                 if ($pop) {
-                                                                    //$buyer_count = $pop->num_rows + 2;
-
-                                                                    while ($row = $pop->fetch_object()) {
-                                                                        //$buyer_id = $row->id;
+                                                                   while ($row = $pop->fetch_object()) {
                                                                         $buyer_type = strtoupper($row->type . '');
-                                                                        //echo "<th>{$buyer_type}</th>";
-
                                                                         array_push($buyer_list, $buyer_type);
                                                                     }
                                                                 }
 
                                                                 $mysqli->close();
                                                             ?>
-
 
                                                             <thead>
                                                                 <tr>
