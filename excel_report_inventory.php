@@ -5,6 +5,23 @@ include('config.php');
 //$curr_date=date('Y-m-d H:i:s A');
 $dt_filename = date('Y-m-d_his');
 
+/* GET ACTIVE BUYER TYPES START */
+include('connect.php');
+$buyer_list = array();
+$sql = "SELECT id, type FROM pos_buyer WHERE status_id=1 ORDER BY type;";
+$pop = $mysqli->query($sql);
+    
+if ($pop) {
+    while ($row = $pop->fetch_object()) {
+        $buyer_type = strtoupper($row->type . '');
+        array_push($buyer_list, $buyer_type);
+    }
+}
+
+$mysqli->close();
+$buyer_count = count($buyer_list);
+/* GET ACTIVE BUYER TYPES END */
+
 $product = $_GET['product'] ? $_GET['product'] : "All";
 $ending_date = $_GET['ending'];
 /**
@@ -60,6 +77,7 @@ $objPHPExcel->getProperties()->setCreator($ufullname)
 
 
 // Add some data
+$selling_price_column = 'F';
 $objPHPExcel->setActiveSheetIndex(0)
     ->setCellValue('A1', $company)
     ->setCellValue('A2', 'Inventory Report')
@@ -68,11 +86,21 @@ $objPHPExcel->setActiveSheetIndex(0)
     ->setCellValue('A4', 'Date Ending')
     ->setCellValue('B4', $ending_date)
 
-    ->setCellValue('A6', 'PRODUCT CODE')
-    ->setCellValue('B6', 'PRODUCT NAME')
-    ->setCellValue('C6', 'UOM')
-    ->setCellValue('D6', 'CATEGORY')
-    ->setCellValue('E6', 'STOCK');
+    ->setCellValue('A7', 'CODE')
+    ->setCellValue('B7', 'PRODUCT')
+    ->setCellValue('C7', 'UOM')
+    ->setCellValue('D7', 'CATEGORY')
+    ->setCellValue('E7', 'STOCK')
+    ->setCellValue('F7', 'SUPPLIER PRICE')
+    ->setCellValue('G6', 'SELLING PRICE');
+      
+foreach ($buyer_list as $buyer){     
+    $selling_price_column++;        
+    $objPHPExcel->setActiveSheetIndex(0)->setCellValue($selling_price_column.'7', $buyer);          
+}
+
+$objPHPExcel->getActiveSheet()->mergeCells('G6:' . $selling_price_column . '6');
+
 
 $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
@@ -107,7 +135,7 @@ if ($sql) {
         $count = $pop->num_rows;
 
         if ($count > 0) {
-            $i = 6;
+            $i = 7;
             while ($row = $pop->fetch_object()) {
                 $i++;
 
@@ -125,12 +153,48 @@ if ($sql) {
 
                 $current_balance = $stock - $sale;
 
+                $supplier_price = $row->supplier_price;
+
                 $objPHPExcel->setActiveSheetIndex(0)
                     ->setCellValue('A' . $i, $code)
                     ->setCellValue('B' . $i, $name)
                     ->setCellValue('C' . $i, $uom)
                     ->setCellValue('D' . $i, $category)
-                    ->setCellValue('E' . $i, $current_balance);
+                    ->setCellValue('E' . $i, $current_balance)
+                    ->setCellValue('F' . $i, $supplier_price);
+                
+                
+                //get all prices from active buyer type
+                $price_sql = "SELECT pp.price as price
+                            FROM pos_price pp
+                            LEFT JOIN pos_buyer pb ON pb.id = pp.buyer_id AND pb.status_id = 1
+                            WHERE pp.product_id={$id} AND pb.status_id=1
+                            ORDER BY pb.type;";
+                                                            
+                $price_pop = $mysqli->query($price_sql);
+                
+                if ($price_pop){
+                    $price_count = $price_pop->num_rows;
+                    $selling_price_column = 'G';
+
+                    if ($price_count > 0){
+                        while($price_row = $price_pop->fetch_object()){  
+                            $price_price = number_format($price_row->price,2,'.',',');
+                            
+                            $objPHPExcel->setActiveSheetIndex(0)->setCellValue($selling_price_column . $i, $price_price);
+                            $objPHPExcel->getActiveSheet()->getStyle($selling_price_column . $i)->getNumberFormat()->setFormatCode('#,##0.00');
+                            $objPHPExcel->getActiveSheet()->getStyle($selling_price_column . $i)->getAlignment()
+                                        ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
+                                        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+                            
+                            $selling_price_column++;
+                        }                            
+                    }else{                         
+                        $objPHPExcel->setActiveSheetIndex(0)->setCellValue($selling_price_column . $i, 'No Price Yet');                            
+                    }
+                }else{
+                    $objPHPExcel->setActiveSheetIndex(0)->setCellValue($selling_price_column . $i, 'Error');
+                }
 
                 $objPHPExcel->getActiveSheet()->getStyle('E' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 
@@ -146,21 +210,21 @@ if ($sql) {
 
                 $objPHPExcel->getActiveSheet()->getStyle('E' . $i . ':E' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
-                $objPHPExcel->getActiveSheet()->freezePane('A7');
+                $objPHPExcel->getActiveSheet()->freezePane('A8');
             }
         } else {
-            $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Error: Record to be printed');
-            $objPHPExcel->getActiveSheet()->mergeCells('A7:E7')
+            $objPHPExcel->getActiveSheet()->setCellValue('A8', 'Error: Record to be printed');
+            $objPHPExcel->getActiveSheet()->mergeCells('A8:' . $selling_price_column . '8')
                 ->getStyle('A7:D7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         }
     } else {
-        $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Error: ' . $mysqli->error);
-        $objPHPExcel->getActiveSheet()->mergeCells('A7:E7')
+        $objPHPExcel->getActiveSheet()->setCellValue('A8', 'Error: ' . $mysqli->error);
+        $objPHPExcel->getActiveSheet()->mergeCells('A8:' . $selling_price_column . '8')
             ->getStyle('A7:D7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     }
 } else {
-    $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Error: Critical Error Encountered!');
-    $objPHPExcel->getActiveSheet()->mergeCells('A7:E7')
+    $objPHPExcel->getActiveSheet()->setCellValue('A8', 'Error: Critical Error Encountered!');
+    $objPHPExcel->getActiveSheet()->mergeCells('A8:' . $selling_price_column . '8')
         ->getStyle('A7:D7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 }
 
