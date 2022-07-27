@@ -8,7 +8,8 @@ $sql = "SELECT s.id as id, DATE(s.dt) as dt, s.tran_id as tran_id, CONCAT(DATE_F
                     d.discount_type as discount_type_word,
                     st.status as status,
                     b.type as buyer_type,
-                    c.category
+                    c.category,
+                    pt.payment_type
             FROM (((pos_sale s
             LEFT JOIN (pos_product p 
                         LEFT JOIN pos_uom u ON u.id=p.product_uom
@@ -16,4 +17,6 @@ $sql = "SELECT s.id as id, DATE(s.dt) as dt, s.tran_id as tran_id, CONCAT(DATE_F
                       ) ON p.id=s.product_id)
             LEFT JOIN pos_product_discount d ON d.id=s.discount_type)
             LEFT JOIN pos_sale_status st ON st.id=s.status_id)
-            LEFT JOIN pos_buyer b ON b.id=s.buyer_id ";
+            LEFT JOIN pos_buyer b ON b.id=s.buyer_id
+            LEFT JOIN pos_transaction t ON t.id=s.tran_id
+            LEFT JOIN pos_payment_type pt ON pt.id=t.payment_type_id ";

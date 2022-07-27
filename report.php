@@ -263,6 +263,7 @@ $mnu = 'menu_report';
                                                                     <th>UOM</th>
                                                                     <th>Category</th>
                                                                     <th>Buyer Type</th>
+                                                                    <th>Payment</th>
                                                                     <th>Price</th>
                                                                     <!--
                                                                     <th>Discount Type</th>

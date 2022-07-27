@@ -87,16 +87,18 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                             </tr>
                         </table>";
 
-    //$_SESSION['signatory']=$signatory;
+    $_SESSION['signatory']=$signatory;
 
 
     $tbl_list = "   <table cellspacing=\"0\" cellpadding=\"1\" border=\"1\" >
-                            <tr align=\"center\" >                                
+                        
+                            <tr align=\"center\" >  
+                                <th  rowspan=\"1\" width=\"3%\" ><b>#</b></th>                              
                                 <th  rowspan=\"1\" width=\"7%\" ><b>DATE</b></th>
                                 <th  rowspan=\"1\" width=\"8%\" ><b>RECEIPT</b></th>
                                 
                                
-                                <th  rowspan=\"1\" width=\"8%\" ><b>PRODUCT CODE</b></th>
+                                <th  rowspan=\"1\" width=\"5%\" ><b>PRODUCT CODE</b></th>
                                 <th  rowspan=\"1\" width=\"15%\" ><b>PRODUCT NAME</b></th>
                                 
                                 
@@ -104,9 +106,10 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                                 <th  rowspan=\"1\" width=\"5%\" ><b>QTY</b></th>
                                 <th  rowspan=\"1\" width=\"5%\" ><b>UOM</b></th>                                
                                 
-                                <th  rowspan=\"1\" width=\"8%\" ><b>CATEGORY</b></th>                               
+                                <th  rowspan=\"1\" width=\"5%\" ><b>CATEGORY</b></th>                               
                                 
-                                <th  rowspan=\"1\" width=\"7%\" ><b>BUYER TYPE</b></th>
+                                <th  rowspan=\"1\" width=\"5%\" ><b>BUYER TYPE</b></th>
+                                <th  rowspan=\"1\" width=\"5%\" ><b>PMT TYPE</b></th>
                                 <th  rowspan=\"1\" width=\"5%\" ><b>PRICE</b></th>
                                 
                                 
@@ -116,8 +119,7 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                                 
                                 <th  rowspan=\"1\" width=\"7%\" ><b>STATUS</b></th>    
                             </tr>
-                            
-                            
+                        
                             ";
 
     include('connect.php');
@@ -131,8 +133,9 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
             $total_total = 0;
             $total_taxbase = 0;
             $total_gst = 0;
-
+            $line = 0;
             while ($row = $pop->fetch_object()) {
+                $line++;
                 $id = $row->id;
                 $tran_id = $row->tran_id;
                 //$receipt = str_pad($row->tran_id, 10,"0", STR_PAD_LEFT);
@@ -145,8 +148,9 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                 $qty = $row->qty;
                 $price = number_format(floatval($row->price), 2, '.', ',');
 
-                //$buyer_type = strtoupper(substr($row->buyer_type . '',0,3));
-                $buyer_type = strtoupper($row->buyer_type);
+                $buyer_type = strtoupper(substr($row->buyer_type . '',0,3));
+                //$buyer_type = strtoupper($row->buyer_type);
+                $payment_type = $row->payment_type;
 
                 $discount_type = $row->discount_type;
                 $discount_type_word = $row->discount_type_word ? $row->discount_type_word : "No Discount";
@@ -171,6 +175,7 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                 $status = $row->status;
 
                 $tbl_list .=  "<tr align=\"center\" >";
+                $tbl_list .=  "  <th>" . $line . "</th>";
                 $tbl_list .=  "  <th>" . $dt_sale . "</th>";
                 $tbl_list .=  "  <th>" . $receipt . "</th>";
                 $tbl_list .=  "  <th>" . $product_code . "</th>";
@@ -179,6 +184,7 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                 $tbl_list .=  "  <th align=\"center\" >" . $uom . "</th>";
                 $tbl_list .=  "  <th align=\"center\" >" . $category . "</th>";
                 $tbl_list .=  "  <th align=\"center\" >" . $buyer_type . "</th>";
+                $tbl_list .=  "  <th align=\"center\" >" . $payment_type . "</th>";
                 $tbl_list .=  "  <th align=\"right\" >" . $price . "</th>";
 
                 /*
@@ -196,9 +202,9 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
             }
             //grand total
             $tbl_list .=  "<tr align=\"center\" >";
-            $tbl_list .=  "  <th colspan=\"4\" align=\"left\" ><b>GRAND TOTAL</b></th>";
+            $tbl_list .=  "  <th colspan=\"5\" align=\"left\" ><b>GRAND TOTAL</b></th>";
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_qty, 2, '.', ',') . "</b></th>";
-            $tbl_list .=  "  <th colspan=\"4\" ></th>";
+            $tbl_list .=  "  <th colspan=\"5\" ></th>";
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_total, 2, '.', ',') . "</b></th>";
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_taxbase, 2, '.', ',') . "</b></th>";
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_gst, 2, '.', ',') . "</b></th>";
@@ -206,12 +212,13 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
             $tbl_list .=  "  <th></th>";
             $tbl_list .=  "</tr>";
         } else {
-            $tbl_list .= "<tr><td colspan=\"13\">No Record</td></tr>";
+            $tbl_list .= "<tr><td colspan=\"14\">No Record</td></tr>";
         }
     } else {
-        $tbl_list .= "<tr><td colspan=\"13\">" . $mysqli->error . "</td></tr>";
+        $tbl_list .= "<tr><td colspan=\"14\">" . $mysqli->error . "</td></tr>";
     }
 
+    
     $tbl_list .= "</table>";
 
     $mysqli->close();

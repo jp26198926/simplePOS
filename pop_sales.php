@@ -21,6 +21,7 @@ if ($pop) {
             $qty = $row->qty;
             $category = $row->category;
             $buyer_type = strtoupper(substr($row->buyer_type . '', 0, 3));
+            $payment_type = $row->payment_type;
             $price = number_format(floatval($row->price), 2, '.', ',');
 
             $discount_type = $row->discount_type;
@@ -57,6 +58,7 @@ if ($pop) {
             echo "<td align='center'>{$uom}</td>";
             echo "<td align='center'>{$category}</td>";
             echo "<td align='center'>{$buyer_type}</td>";
+            echo "<td align='center'>{$payment_type}</td>";
             echo "<td align='right'>{$price}</td>";
 
             /*

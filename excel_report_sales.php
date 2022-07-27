@@ -70,11 +70,12 @@ $objPHPExcel->setActiveSheetIndex(0)
     ->setCellValue('F6', 'UOM')
     ->setCellValue('G6', 'CATEGORY')
     ->setCellValue('H6', 'BUYER TYPE')
-    ->setCellValue('I6', 'PRICE')
-    ->setCellValue('J6', 'TOTAL')
-    ->setCellValue('K6', 'TAXBASE')
-    ->setCellValue('L6', 'GST')
-    ->setCellValue('M6', 'STATUS');
+    ->setCellValue('I6', 'PAYMENT')
+    ->setCellValue('J6', 'PRICE')
+    ->setCellValue('K6', 'TOTAL')
+    ->setCellValue('L6', 'TAXBASE')
+    ->setCellValue('M6', 'GST')
+    ->setCellValue('N6', 'STATUS');
 
 $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
@@ -89,15 +90,16 @@ $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
 $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
+$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
 
 
 $objPHPExcel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
-$objPHPExcel->getActiveSheet()->getStyle('A6:M6')->getFont()->setBold(true);
+$objPHPExcel->getActiveSheet()->getStyle('A6:N6')->getFont()->setBold(true);
 
-$objPHPExcel->getActiveSheet()->getStyle('A6:M6')
+$objPHPExcel->getActiveSheet()->getStyle('A6:N6')
     ->getAlignment()->setWrapText(true);
 
-$objPHPExcel->getActiveSheet()->getStyle('A6:M6')->getAlignment()
+$objPHPExcel->getActiveSheet()->getStyle('A6:N6')->getAlignment()
     ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
     ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
@@ -105,7 +107,7 @@ $objPHPExcel->getActiveSheet()->getStyle('A6:M6')->getAlignment()
 //$objPHPExcel->getActiveSheet()->mergeCells('A4:C4')
 //							  ->getStyle('A4:C4')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
-$objPHPExcel->getActiveSheet()->getStyle('J6:J6')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+$objPHPExcel->getActiveSheet()->getStyle('K6:K6')->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
 $sql = $_SESSION['sales_sql'];
 
@@ -141,6 +143,7 @@ if ($sql) {
                 $qty = $row->qty;
                 $category = $row->category;
                 $buyer_type = strtoupper($row->buyer_type);
+                $payment_type = $row->payment_type;
 
                 $price = number_format(floatval($row->price), 2, '.', ',');
 
@@ -176,16 +179,17 @@ if ($sql) {
                     ->setCellValue('F' . $i, $uom)
                     ->setCellValue('G' . $i, $category)
                     ->setCellValue('H' . $i, $buyer_type)
-                    ->setCellValue('I' . $i, $price)
-                    ->setCellValue('J' . $i, $total)
-                    ->setCellValue('K' . $i, $taxbase)
-                    ->setCellValue('L' . $i, $gst)
-                    ->setCellValue('M' . $i, $status);
+                    ->setCellValue('I' . $i, $payment_type)
+                    ->setCellValue('J' . $i, $price)
+                    ->setCellValue('K' . $i, $total)
+                    ->setCellValue('L' . $i, $taxbase)
+                    ->setCellValue('M' . $i, $gst)
+                    ->setCellValue('N' . $i, $status);
 
+                $objPHPExcel->getActiveSheet()->getStyle('J' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
                 $objPHPExcel->getActiveSheet()->getStyle('K' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
                 $objPHPExcel->getActiveSheet()->getStyle('L' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
                 $objPHPExcel->getActiveSheet()->getStyle('M' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
-                //$objPHPExcel->getActiveSheet()->getStyle('L' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 
 
                 $objPHPExcel->getActiveSheet()->getStyle('A' . $i . ':B' . $i)->getAlignment()
@@ -200,11 +204,11 @@ if ($sql) {
                     ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
                     ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-                $objPHPExcel->getActiveSheet()->getStyle('I' . $i . ':M' . $i)->getAlignment()
+                $objPHPExcel->getActiveSheet()->getStyle('J' . $i . ':N' . $i)->getAlignment()
                     ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
                     ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
-                $objPHPExcel->getActiveSheet()->getStyle('I' . $i . ':I' . $i)->getAlignment()
+                $objPHPExcel->getActiveSheet()->getStyle('J' . $i . ':J' . $i)->getAlignment()
                     ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
                     ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
@@ -218,7 +222,7 @@ if ($sql) {
                                     ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);			
 						*/
 
-                $objPHPExcel->getActiveSheet()->getStyle('L' . $i . ':L' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+                $objPHPExcel->getActiveSheet()->getStyle('M' . $i . ':M' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
 
                 $objPHPExcel->getActiveSheet()->freezePane('A7');
 
@@ -234,14 +238,14 @@ if ($sql) {
             $objPHPExcel->setActiveSheetIndex(0)
                 ->setCellValue('A' . $i, "GRAND TOTAL")
                 ->setCellValue('E' . $i, $total_qty)
-                ->setCellValue('J' . $i, $total_total)
-                ->setCellValue('K' . $i, $total_taxbase)
-                ->setCellValue('L' . $i, $total_gst);
+                ->setCellValue('K' . $i, $total_total)
+                ->setCellValue('L' . $i, $total_taxbase)
+                ->setCellValue('M' . $i, $total_gst);
 
-            $objPHPExcel->getActiveSheet()->getStyle('I' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
             $objPHPExcel->getActiveSheet()->getStyle('J' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
             $objPHPExcel->getActiveSheet()->getStyle('K' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
-            //$objPHPExcel->getActiveSheet()->getStyle('L' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
+            $objPHPExcel->getActiveSheet()->getStyle('L' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
+            $objPHPExcel->getActiveSheet()->getStyle('M' . $i)->getNumberFormat()->setFormatCode('#,##0.00');
 
 
             $objPHPExcel->getActiveSheet()->getStyle('A' . $i . ':B' . $i)->getAlignment()
@@ -256,7 +260,7 @@ if ($sql) {
                 ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
                 ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-            $objPHPExcel->getActiveSheet()->getStyle('I' . $i . ':L' . $i)->getAlignment()
+            $objPHPExcel->getActiveSheet()->getStyle('J' . $i . ':M' . $i)->getAlignment()
                 ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
                 ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
 
@@ -264,21 +268,21 @@ if ($sql) {
             //     ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
             //     ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
-            $objPHPExcel->getActiveSheet()->getStyle('L' . $i . ':L' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
+            $objPHPExcel->getActiveSheet()->getStyle('M' . $i . ':M' . $i)->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);
         } else {
             $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Error: Record to be printed');
-            $objPHPExcel->getActiveSheet()->mergeCells('A7:M7')
+            $objPHPExcel->getActiveSheet()->mergeCells('A7:N7')
                 ->getStyle('A7:M7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         }
     } else {
         $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Error: ' . $mysqli->error);
-        $objPHPExcel->getActiveSheet()->mergeCells('A7:M7')
+        $objPHPExcel->getActiveSheet()->mergeCells('A7:N7')
             ->getStyle('A7:M7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     }
 } else {
     $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Error: Critical Error Encountered!');
-    $objPHPExcel->getActiveSheet()->mergeCells('A7:M7')
-        ->getStyle('A7:M7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+    $objPHPExcel->getActiveSheet()->mergeCells('A7:N7')
+        ->getStyle('A7:N7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 }
 
 
