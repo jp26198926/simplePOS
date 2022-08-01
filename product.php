@@ -1400,51 +1400,51 @@ $mnu = 'menu_product';
 
         if (id) {
             if (product_name && supplier) {
-                if (qty > 0) {
-                    $(".buttons_show, .error_show, .modal-body").css("display", "none");
-                    $(".progress_show").css("display", "block");
+                //if (qty > 0) { //removed for the meantime to accept negative value 2022-07-3
+                $(".buttons_show, .error_show, .modal-body").css("display", "none");
+                $(".progress_show").css("display", "block");
 
-                    $.post("db_receiving.php", {
-                        action: 2,
-                        id: id,
-                        qty: qty,
-                        price: price,
-                        supplier: supplier
-                    }, function(data) {
-                        $(".buttons_show, .modal-body").css("display", "block");
-                        $(".progress_show, .error_show").css("display", "none");
+                $.post("db_receiving.php", {
+                    action: 2,
+                    id: id,
+                    qty: qty,
+                    price: price,
+                    supplier: supplier
+                }, function(data) {
+                    $(".buttons_show, .modal-body").css("display", "block");
+                    $(".progress_show, .error_show").css("display", "none");
 
-                        if (data.indexOf("<!DOCTYPE html>") > -1) {
-                            showError('Simple POS',
-                                "Error: Session Time-Out, You must login again to continue.");
-                            location.reload(true);
-                        } else if (data.indexOf("Error: ") > -1) {
-                            $(".success_show").css('display', 'none');
-                            $(".error_show").css("display", "block");
-                            $(".error_msg").text(data);
-                            $("#txt_receiving_code").select().focus();
-                        } else {
-                            $("#tbl_receiving_list tbody").html(data);
+                    if (data.indexOf("<!DOCTYPE html>") > -1) {
+                        showError('Simple POS',
+                            "Error: Session Time-Out, You must login again to continue.");
+                        location.reload(true);
+                    } else if (data.indexOf("Error: ") > -1) {
+                        $(".success_show").css('display', 'none');
+                        $(".error_show").css("display", "block");
+                        $(".error_msg").text(data);
+                        $("#txt_receiving_code").select().focus();
+                    } else {
+                        $("#tbl_receiving_list tbody").html(data);
 
-                            $(".success_msg").text("Successfully Saved! " + qty + " " + uom + " " +
-                                product_name);
-                            $(".success_show").css('display', 'block');
+                        $(".success_msg").text("Successfully Saved! " + qty + " " + uom + " " +
+                            product_name);
+                        $(".success_show").css('display', 'block');
 
-                            $(".txt-receiving").val("");
-                            $("#txt_receiving_code").select().focus();
+                        $(".txt-receiving").val("");
+                        $("#txt_receiving_code").select().focus();
 
-                            $('[data-toggle="tooltip"]').tooltip({
-                                html: true
-                            });
-                        }
-                    });
+                        $('[data-toggle="tooltip"]').tooltip({
+                            html: true
+                        });
+                    }
+                });
 
-                } else {
-                    $(".success_show").css('display', 'none');
-                    $(".error_msg").text("Error: Quantity must be greater than 0.");
-                    $(".error_show").css('display', 'block');
-                    $("#txt_receiving_code").select().focus();
-                }
+                // } else {
+                //     $(".success_show").css('display', 'none');
+                //     $(".error_msg").text("Error: Quantity must be greater than 0.");
+                //     $(".error_show").css('display', 'block');
+                //     $("#txt_receiving_code").select().focus();
+                // }
             } else {
                 $(".success_show").css('display', 'none');
                 $(".error_msg").text("Error: Fields with red asterisk are required!");

@@ -100,6 +100,27 @@
             $(this).val('0.00');
         }
     });
+
+    $(document).on('keypress','.numeric-with-negative', function(e){       
+        if ((e.which < 48 && e.which != 46 && e.which != 45) || e.which > 57) {
+            return false;
+        }else if (e.which == 46){ //decimal
+            if ($(this).val().indexOf('.') > -1) {
+                return false;
+            }
+        }else if (e.which == 45){ //negative
+            if ($(this).val().indexOf('-') > -1) {
+                return false;
+            }
+        }
+    });
+      
+    $(document).on('blur','.numeric-with-negative',function(e){
+        e.preventDefault();
+        if ($(this).val().length == 0) {
+            $(this).val('0.00');
+        }
+    });
     
     function number_format(n, currency) {
       return currency + " " + n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");

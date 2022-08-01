@@ -51,7 +51,7 @@
             $total = $qty * $price;
             
             if ($product_id && $supplier){
-                if ($qty > 0){
+                //if ($qty > 0){ //remove this one for the moment to accept negative value 2022-07-30
                     $sql = "INSERT INTO pos_stock (dt, product_id, qty, price, total, supplier_id, received_by)
                             VALUES ('{$dt}',{$product_id},{$qty},{$price},{$total},{$supplier},{$uid});";
                                 
@@ -90,9 +90,9 @@
                     }else{
                         echo "Error: " . $mysqli->error;
                     }                                       
-                }else{
-                    echo  "Error: Quantity must be greater than 0."; 
-                }            
+                // }else{
+                //     echo  "Error: Quantity must be greater than 0."; 
+                // }            
             }else{
                 echo  "Error: Fields with red asterisk are required!";    
             }

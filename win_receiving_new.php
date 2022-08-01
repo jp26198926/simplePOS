@@ -38,7 +38,7 @@
                         </label>
                         <div class="input-group">
                             <input type='text' id='txt_receiving_qty' placeholder='0.00'
-                                class='form-control text-right txt-receiving numeric' />
+                                class='form-control text-right txt-receiving numeric-with-negative' />
                             <span class="input-group-addon">
                                 <span id='txt_receiving_uom'></span>
                             </span>
