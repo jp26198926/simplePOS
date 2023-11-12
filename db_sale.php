@@ -224,7 +224,7 @@ switch ($action) {
         }
         break;
 
-    case 9: //save sale            
+    case 9: //save sale
 
         $subtotal = floatval($_POST['subtotal']);
         $discount = floatval($_POST['discount']);
@@ -240,7 +240,7 @@ switch ($action) {
 
         $receipt_prefix = date('y');
         $receipt_no = $receipt_prefix . '00000000';
-		
+
         $gst = floatval($gst_percent/100);
         $divisor = 1 + $gst;
         $tax_base = floatval($amount_due) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
@@ -251,7 +251,7 @@ switch ($action) {
             //save tran
             $sql = "INSERT INTO pos_transaction (
                                                     dt,subtotal,discount_total,discount_type,discount_qty,
-                                                    total,tran_cash,tran_change, payment_type_id, 
+                                                    total,tran_cash,tran_change, payment_type_id,
                                                     `reference`, user_id,remarks, gst_percent, gst_value, tax_base
                                                 )
                         VALUES (
@@ -295,7 +295,7 @@ switch ($action) {
                             $trail_save = $mysqli->query($trail_query);
                         }
                     }
-                    //end of sold item trail                        
+                    //end of sold item trail
 
                     echo $receipt_no . ":~|~:";
 
@@ -339,7 +339,7 @@ switch ($action) {
                     /*
                         echo "<tr>";
                         echo "   <td align='right'>DISCOUNT</td>";
-                        echo "   <td align='right'>" . number_format($discount,2,'.',',') . "</td>";                       
+                        echo "   <td align='right'>" . number_format($discount,2,'.',',') . "</td>";
                         echo "</tr>";
                         */
                     echo "<tr>";
