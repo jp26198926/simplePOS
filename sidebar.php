@@ -1,6 +1,7 @@
 <aside class="app-sidebar" id="sidebar">
   <div class="sidebar-header">
     <a class="sidebar-brand" href="#"><span class="highlight">Simple</span> POS</a>
+    <div class="text-center">Station: <span class="station_id">0</div>
     <button type="button" class="sidebar-toggle">
       <i class="fa fa-times"></i>
     </button>
@@ -73,13 +74,18 @@
                       <li><a href='./dept.php'>Department </a></li>
                       <li><a href='#'>Access Level </a></li>
                       -->
-                      
+
                       <li class='line'></li>
-                      
-                      <li class='section'><i class='fa fa-file-text-o' aria-hidden='true'></i> Trail</li>            
+
+                      <li class='section'><i class='fa fa-check' aria-hidden='true'></i>Application</li>
+                      <li><a href='./settings.php'>Settings </a></li>
+
+                      <li class='line'></li>
+
+                      <li class='section'><i class='fa fa-file-text-o' aria-hidden='true'></i> Trail</li>
                       <li><a href='trail_login.php'>Login History</a></li>
                       <li><a href='trail_transaction.php'>Transaction</a></li>
-                      
+
                     </ul>
                   </div>
               </li>";

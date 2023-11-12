@@ -12,14 +12,9 @@ $mnu = "menu_main";
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="./assets/css/vendor.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/flat-admin.css">
-
-  <!-- Theme -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue-sky.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/red.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/yellow.css">
+  <?php
+    include("layout_style.php");
+  ?>
 
 </head>
 
@@ -202,13 +197,9 @@ $mnu = "menu_main";
 
   </div>
 
-  <script type="text/javascript" src="./assets/js/vendor.js"></script>
-  <script type="text/javascript" src="./assets/js/app.js"></script>
-  <script type="text/javascript" src="./assets/js/changepass.js"></script>
-
-
   <?php
-  include('menu-active.php');
+    include("layout_script.php");
+    include('menu-active.php');
   ?>
 
   <script>
@@ -251,9 +242,9 @@ $mnu = "menu_main";
 
         if (data.indexOf("<!DOCTYPE html>") > -1) {
           //showError('Simple POS',"Error: Session Time-Out, You must login again to continue.");
-          //location.reload(true);                     
+          //location.reload(true);
         } else if (data.indexOf("Error: ") > -1) {
-          //showError('Simple POS', data);                 
+          //showError('Simple POS', data);
         } else {
           $("#tbl_product_list_mon tbody").html(data);
 
@@ -338,7 +329,7 @@ $mnu = "menu_main";
         out_stock();
         sale_graph();
         current_product();
-      }, 1000);
+      }, 10000);
 
     })
   </script>

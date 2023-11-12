@@ -12,19 +12,9 @@ $mnu = 'menu_admin';
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="./assets/css/vendor.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/flat-admin.css">
-
-  <!-- Theme -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue-sky.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/red.css">
-
-  <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap-dialog.css">
-
-  <!-- Quotes -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/qoutes.css">
-
+  <?php
+    include("layout_style.php");
+  ?>
 
 </head>
 
@@ -80,7 +70,7 @@ $mnu = 'menu_admin';
 
             </ul>
 
-            <?php //include('profile.php'); 
+            <?php //include('profile.php');
             ?>
 
           </div>
@@ -133,11 +123,10 @@ $mnu = 'menu_admin';
 
   </div>
 
-  <script type="text/javascript" src="./assets/js/vendor.js"></script>
-  <script type="text/javascript" src="./assets/js/app.js"></script>
-
-  <script type="text/javascript" src="./assets/js/bootstrap-dialog.js"></script>
-  <script type="text/javascript" src="./assets/js/functions.js"></script>
+  <?php
+    include("layout_script.php");
+    include('menu-active.php');
+  ?>
 
   <script>
     $(document).ready(function() {

@@ -1,0 +1,1 @@
+ALTER TABLE `pos_transaction` ADD `station_id` INT NOT NULL DEFAULT '0' AFTER `user_id`;

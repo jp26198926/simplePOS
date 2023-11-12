@@ -12,19 +12,9 @@ $mnu = 'menu_admin';
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="./assets/css/vendor.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/flat-admin.css">
-
-  <!-- Theme -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue-sky.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/red.css">
-
-  <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap-dialog.css">
-
-  <!-- Quotes -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/qoutes.css">
-
+  <?php
+    include("layout_style.php");
+  ?>
 
 </head>
 
@@ -80,7 +70,7 @@ $mnu = 'menu_admin';
 
             </ul>
 
-            <?php //include('profile.php'); 
+            <?php //include('profile.php');
             ?>
 
           </div>
@@ -132,38 +122,36 @@ $mnu = 'menu_admin';
 
   </div>
 
-  <script type="text/javascript" src="./assets/js/vendor.js"></script>
-  <script type="text/javascript" src="./assets/js/app.js"></script>
-
-  <script type="text/javascript" src="./assets/js/bootstrap-dialog.js"></script>
-  <script type="text/javascript" src="./assets/js/functions.js"></script>
-
+  <?php
+      include("layout_script.php");
+      include('menu-active.php');
+  ?>
   <script>
     /*
     $('[data-toggle="tooltip"]').tooltip({html:true});
-    
+
     function getQoutes() {
           $.get("db_qoutes.php",function(data){
               if (data.indexOf("Error: ")>-1) {
-                      
-              }else{                      
+
+              }else{
                   data1 = data.split(":~:|:~:")[0];
                   data2 = data.split(":~:|:~:")[1];
                   data3 = data.split(":~:|:~:")[2];
-                      
+
                   qoutes1 = data1.split(":~|~:")[0];
                   author1 = data1.split(":~|~:")[1];
                   qoutes2 = data2.split(":~|~:")[0];
                   author2 = data2.split(":~|~:")[1];
                   qoutes3 = data3.split(":~|~:")[0];
                   author3 = data3.split(":~|~:")[1];
-                      
+
                   $(".qoutes_msg1").text(qoutes1);
                   $(".qoutes_author1").text(author1);
                   $(".qoutes_msg2").text(qoutes2);
                   $(".qoutes_author2").text(author2);
                   $(".qoutes_msg3").text(qoutes3);
-                  $(".qoutes_author3").text(author3);                      
+                  $(".qoutes_author3").text(author3);
               }
           });
     }
@@ -175,13 +163,13 @@ $mnu = 'menu_admin';
           pause: true,
           interval: 4000,
       });
-        
+
       getQoutes();
-        
+
       setInterval(function() {
              getQoutes();
       }, 10000); //1 seconds
-      
+
       */
 
 

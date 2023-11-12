@@ -103,7 +103,7 @@ switch ($action) {
 
     case 5: //product monitoring
         include('query_product.php');
-        $sql .= ' ORDER BY p.product_name;';
+        $sql .= ' ORDER BY ABS(stock) ASC LIMIT 10;';
 
         include('pop_product_dashboard.php');
 

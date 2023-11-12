@@ -4,6 +4,7 @@ include('connect.php');
 include('config.php');
 
 $action = $_POST['action'];
+$station_id = isset($_POST['station_id']) ? $_POST['station_id'] : 0;
 
 switch ($action) {
     case 1: //search code
@@ -29,15 +30,15 @@ switch ($action) {
                     $total = $qty * $price;
 
                     //save to temp
-                    $sql = "INSERT INTO pos_sale_temp (product_id,qty,buyer_id,current_price,total)
-                                VALUES ({$product_id},{$qty},{$buyer_type},{$price},{$total});";
+                    $sql = "INSERT INTO pos_sale_temp (product_id,qty,buyer_id,current_price,total,station_id)
+                                VALUES ({$product_id},{$qty},{$buyer_type},{$price},{$total},{$station_id});";
 
                     $save = $mysqli->query($sql);
                     if ($save) {
                         //populate
                         include('query_sale_additem.php');
 
-                        $sql .= " ORDER BY t.id DESC;";
+                        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
                         include('pop_sale_additem.php');
                     } else {
@@ -56,7 +57,7 @@ switch ($action) {
         break;
 
     case 2: //pos temp
-        $sql = "SELECT count(*) as count FROM pos_sale_temp;";
+        $sql = "SELECT count(*) as count FROM pos_sale_temp WHERE station_id={$station_id};";
         $exec = $mysqli->query($sql);
         if ($exec) {
             $row = $exec->fetch_object();
@@ -71,19 +72,19 @@ switch ($action) {
     case 3: //pop temp record
         include('query_sale_additem.php');
 
-        $sql .= " ORDER BY t.id DESC;";
+        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
         include('pop_sale_additem.php');
 
         break;
 
-    case 4: //delete all data fromt temp db
-        $sql = "DELETE FROM pos_sale_temp;";
+    case 4: //delete all data from temp db
+        $sql = "DELETE FROM pos_sale_temp WHERE station_id = {$station_id};";
         $exec = $mysqli->query($sql);
         if ($exec) {
             include('query_sale_additem.php');
 
-            $sql .= " ORDER BY t.id DESC;";
+            $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
             include('pop_sale_additem.php');
         } else {
@@ -100,7 +101,7 @@ switch ($action) {
         if ($exec) {
             include('query_sale_additem.php');
 
-            $sql .= " ORDER BY t.id DESC;";
+            $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
             include('pop_sale_additem.php');
         } else {
@@ -179,7 +180,7 @@ switch ($action) {
                     if ($exec) {
                         include('query_sale_additem.php');
 
-                        $sql .= " ORDER BY t.id DESC;";
+                        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
                         include('pop_sale_additem.php');
                     } else {
@@ -213,7 +214,7 @@ switch ($action) {
             if ($exec) {
                 include('query_sale_additem.php');
 
-                $sql .= " ORDER BY t.id DESC;";
+                $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
                 include('pop_sale_additem.php');
             } else {
@@ -225,7 +226,6 @@ switch ($action) {
         break;
 
     case 9: //save sale
-
         $subtotal = floatval($_POST['subtotal']);
         $discount = floatval($_POST['discount']);
         $discount_type = intval($_POST['discount_type']);
@@ -252,13 +252,14 @@ switch ($action) {
             $sql = "INSERT INTO pos_transaction (
                                                     dt,subtotal,discount_total,discount_type,discount_qty,
                                                     total,tran_cash,tran_change, payment_type_id,
-                                                    `reference`, user_id,remarks, gst_percent, gst_value, tax_base
+                                                    `reference`, user_id,remarks, gst_percent, gst_value, tax_base,
+                                                    station_id
                                                 )
                         VALUES (
                                     '{$dt}',{$subtotal},{$discount},{$discount_type},
                                     {$discount_qty},{$amount_due},{$cash},{$change},
                                     {$payment_type_id}, '{$reference}',{$uid},'{$remarks}',
-                                    {$gst_percent}, {$gst_value}, {$tax_base}
+                                    {$gst_percent}, {$gst_value}, {$tax_base}, {$station_id}
                                 );";
 
             $exec = $mysqli->query($sql);
@@ -380,7 +381,7 @@ switch ($action) {
                     echo "</tr>";
 
                     //empty temp table
-                    $sql = "TRUNCATE pos_sale_temp;";
+                    $sql = "DELETE FROM pos_sale_temp WHERE station_id = {$station_id};";
                     $exec = $mysqli->query($sql);
 
                     echo ":~|~:";
@@ -388,7 +389,7 @@ switch ($action) {
                     if ($exec) {
                         include('query_sale_additem.php');
 
-                        $sql .= " ORDER BY t.id DESC;";
+                        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
 
                         include('pop_sale_additem.php');
                     } else {

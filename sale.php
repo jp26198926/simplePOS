@@ -12,17 +12,9 @@ $mnu = 'menu_sale';
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="./assets/css/vendor.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/flat-admin.css">
-
-  <!-- Theme -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue-sky.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/red.css">
-  <link rel="stylesheet" type="text/css" href="./assets/css/theme/yellow.css">
-
-  <!-- Quotes -->
-  <link rel="stylesheet" type="text/css" href="./assets/css/qoutes.css">
+  <?php
+    include("layout_style.php");
+  ?>
 
 </head>
 
@@ -333,19 +325,9 @@ $mnu = 'menu_sale';
     </div>
   </div>
 
-  <script type="text/javascript" src="./assets/js/vendor.js"></script>
-  <script type="text/javascript" src="./assets/js/app.js"></script>
-  <script type="text/javascript" src="./assets/js/changepass.js"></script>
-
-  <script type="text/javascript" src="./assets/js/bootstrap-dialog.js"></script>
-  <script type="text/javascript" src="./assets/js/functions.js"></script>
-
-  <script type="text/javascript" src="./assets/js/jquery.number.js"></script>
-
-  <script type="text/javascript" src="./assets/js/printThis.js"></script>
-
   <?php
-  include('menu-active.php');
+    include("layout_script.php");
+    include('menu-active.php');
   ?>
 
   <script>
@@ -401,8 +383,11 @@ $mnu = 'menu_sale';
     }
 
     var currentLock = 0;
+    var station_id = 0;
 
     $(document).ready(function() {
+      station_id = Number($(".station_id").text());
+
       setInterval(function() {
         serverTime();
 
@@ -422,11 +407,11 @@ $mnu = 'menu_sale';
 
       }, 1000);
 
-
       $("#loading").modal();
 
       $.post("db_sale.php", {
-        action: 2
+        action: 2,
+        station_id: station_id
       }, function(data) {
         $("#loading").modal('hide');
 
@@ -460,7 +445,8 @@ $mnu = 'menu_sale';
                 if (result) { //load data from the temp db
 
                   $.post("db_sale.php", {
-                    action: 3
+                    action: 3,
+                    station_id: station_id
                   }, function(data) {
                     if (data.indexOf("<!DOCTYPE html>") > -1) {
                       showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
@@ -495,7 +481,8 @@ $mnu = 'menu_sale';
 
                 } else { //delete all data from the temp db
                   $.post("db_sale.php", {
-                    action: 4
+                    action: 4,
+                    station_id: station_id
                   }, function(data) {
                     if (data.indexOf("<!DOCTYPE html>") > -1) {
                       showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
@@ -521,7 +508,6 @@ $mnu = 'menu_sale';
 
       $('#txt_sale_additem').val('').focus();
 
-
     });
 
     $(document).on('click', '#btn_sale_pay', function(e) {
@@ -529,10 +515,9 @@ $mnu = 'menu_sale';
 
       $('#win_sale_payment').modal();
 
-      //$('#win_sale_payment').on('shown.bs.modal', function() {      
+      //$('#win_sale_payment').on('shown.bs.modal', function() {
       $("#payment_type_1").trigger("click"); //cash
       //});
-
 
     });
 
@@ -601,7 +586,8 @@ $mnu = 'menu_sale';
             change: change,
             payment_type_id: payment_type_id,
             payment_type_label: payment_type_label,
-            reference: reference
+            reference: reference,
+            station_id: station_id
           },
           function(data) {
 
@@ -697,7 +683,8 @@ $mnu = 'menu_sale';
 
             $.post("db_sale.php", {
               action: 12,
-              action_id: 1
+              action_id: 1,
+              station_id: station_id
             }, function(data) {
               if (data.indexOf("<!DOCTYPE html>") > -1) {
                 showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
@@ -721,101 +708,6 @@ $mnu = 'menu_sale';
       }
     });
 
-    // $(document).on('click', '#btn_sale_commit', function(e) {
-    //   e.preventDefault();
-
-    //   var subtotal = parseFloat($('#hidden_subtotal').val());
-    //   var discount = parseFloat($('#hidden_discount').val());
-    //   var discount_qty = parseFloat($('#hidden_discount_qty').val());
-    //   var discount_type = parseInt($('#hidden_discount_type').val());
-    //   var amount_due = parseFloat($('#hidden_amountdue').val());
-
-    //   var cash = parseFloat($('#txt_cash').val());
-    //   var remarks = $('#txt_sale_remarks').val();
-    //   var change = cash - amount_due;
-
-
-    //   if (amount_due > 0.001 && cash >= amount_due) {
-    //     $("#loading").modal();
-    //     $.post("db_sale.php", {
-    //         action: 9,
-    //         subtotal: subtotal,
-    //         discount: discount,
-    //         discount_qty: discount_qty,
-    //         remarks: remarks,
-    //         discount_type: discount_type,
-    //         amount_due: amount_due,
-    //         cash: cash,
-    //         change: change
-    //       },
-    //       function(data) {
-
-    //         $("#loading").modal('hide');
-
-    //         if (data.indexOf("<!DOCTYPE html>") > -1) {
-    //           alert("Error: Session Time-Out, You must login again to continue.");
-    //           location.reload(true);
-    //         } else if (data.indexOf("Error: ") > -1) {
-    //           showError("<?= $app_name; ?>", data);
-    //         } else {
-    //           $('#sale_receipt_no').text(data.split(':~|~:')[0]);
-    //           $('#print_content').html(data.split(':~|~:')[1]);
-    //           $('#print_total').html(data.split(':~|~:')[2]);
-    //           $('#print').printThis();
-
-
-    //           var lst = data.split(":~|~:")[3];
-
-    //           $('#hidden_subtotal').val("0.00");
-    //           $('#lbl_subtotal').text("0.00");
-
-    //           $('#hidden_discount').val("0.00");
-    //           $('#lbl_discount').text("0.00");
-
-    //           $('#hidden_discount_qty').val("0.00");
-    //           $('#hidden_discount_type').val("0");
-
-    //           $('#hidden_amountdue').val("0.00");
-    //           $("#lbl_amountdue").text("0.00");
-
-    //           $('#txt_cash').val("0.00");
-    //           $('#lbl_change').text("0.00");
-    //           $('#txt_sale_remarks').val("");
-
-    //           $("#lbl_discount").attr("data-original-title", "");
-
-    //           $("#tbl_sale_itemlist tbody").html(lst);
-
-    //           $('[data-toggle="tooltip"]').tooltip({
-    //             html: true
-    //           });
-
-
-    //           BootstrapDialog.show({
-    //             title: "<b style='color:grey;'><?= $app_name; ?> </b>",
-    //             message: "<span class='alert alert-success'><i class='fa fa-check fa-2x fa-fw'></i>Transaction Completed, Press ENTER to continue.</span>",
-    //             buttons: [{
-    //               label: 'Continue',
-    //               hotkey: 13, // Enter key
-    //               cssClass: 'btn-success',
-    //               action: function(dialogRef) {
-    //                 dialogRef.close();
-    //                 $('#txt_sale_additem').val('').focus();
-    //               }
-    //             }]
-    //           });
-
-    //           $('#txt_sale_additem').val('').focus();
-    //         }
-
-    //       });
-    //   } else {
-    //     showError("<?= $app_name; ?>", "Error: Invalid Amount Due or Cash is less than the amount due!");
-    //   }
-
-    // });
-
-
     $(document).on('keypress', '#txt_sale_discount_value', function(e) {
       if (e.which == 13) {
         $('#btn_sale_discount_save').trigger('click');
@@ -833,11 +725,6 @@ $mnu = 'menu_sale';
       var subtotal = parseFloat($("#hidden_subtotal").val());
 
       var type_text = "NO DISCOUNT";
-
-      //var discount = parseFloat($("#hidden_discount").val());
-      //var discount_qty = parseFloat($("#hidden_discount_qty").val());
-      //var discount_type = parseInt($("#hidden_discount_type").val());
-      //var amountdue = parseFloat($("#hidden_amountdue").val());
 
       var total_discount;
 
@@ -886,9 +773,6 @@ $mnu = 'menu_sale';
 
     });
 
-
-
-
     $(document).on('keyup', '#txt_sale_discount_value', function(e) {
       $('#txt_sale_discount_type').trigger('change');
     });
@@ -898,7 +782,6 @@ $mnu = 'menu_sale';
       var type = parseInt($(this).val());
       var value = $('#txt_sale_discount_value').val();
       var subtotal = parseFloat($("#hidden_subtotal").val());
-
 
       var total_discount;
 
@@ -950,8 +833,6 @@ $mnu = 'menu_sale';
       $('#txt_sale_discount_type').focus();
     });
 
-
-
     $(document).on('keypress', '#txt_sale_discount_itemvalue', function(e) {
       if (e.which == 13) {
         $("#btn_sale_discount_itemsave").trigger('click');
@@ -975,10 +856,11 @@ $mnu = 'menu_sale';
           id: id,
           type: type,
           value: value,
-          total: total
+          total: total,
+          station_id: station_id
         }, function(data) {
-          $(".progress_show, .error_show, .modal-body").css("display", "none");
-          $(".buttons_show").css("display", "block");
+          $(".progress_show, .error_show").css("display", "none");
+          $(".buttons_show, .modal-body").css("display", "block");
 
           if (data.indexOf("<!DOCTYPE html>") > -1) {
             alert("Error: Session Time-Out, You must login again to continue.");
@@ -1053,8 +935,6 @@ $mnu = 'menu_sale';
       $("#hidden_sale_discount_itemtotal").val(total_discount);
     });
 
-
-
     $('#win_sale_itemdiscount').on('shown.bs.modal', function() {
       $('#txt_sale_discount_itemtype').focus();
     });
@@ -1074,7 +954,8 @@ $mnu = 'menu_sale';
 
         $.post("db_sale.php", {
           action: 6,
-          id: id
+          id: id,
+          station_id: station_id
         }, function(data) {
 
           if (data.indexOf("<!DOCTYPE html>") > -1) {
@@ -1139,10 +1020,11 @@ $mnu = 'menu_sale';
           $.post("db_sale.php", {
             action: 7,
             id: id,
-            qty: qty
+            qty: qty,
+            station_id: station_id
           }, function(data) {
-            $(".progress_show, .error_show, .modal-body").css("display", "none");
-            $(".buttons_show").css("display", "block");
+            $(".progress_show, .error_show").css("display", "none");
+            $(".buttons_show, .modal-body").css("display", "block");
 
             if (data.indexOf("<!DOCTYPE html>") > -1) {
               alert("Error: Session Time-Out, You must login again to continue.");
@@ -1216,7 +1098,8 @@ $mnu = 'menu_sale';
 
         $.post("db_sale.php", {
           action: 6,
-          id: id
+          id: id,
+          station_id: station_id
         }, function(data) {
 
           if (data.indexOf("<!DOCTYPE html>") > -1) {
@@ -1280,7 +1163,8 @@ $mnu = 'menu_sale';
           // result will be true if button was click, while it will be false if users close the dialog directly.
           if (result) { //load data from the temp db
             $.post("db_sale.php", {
-              action: 4
+              action: 4,
+              station_id: station_id
             }, function(data) {
               if (data.indexOf("<!DOCTYPE html>") > -1) {
                 showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
@@ -1348,7 +1232,8 @@ $mnu = 'menu_sale';
 
               $.post("db_sale.php", {
                 action: 5,
-                id: id
+                id: id,
+                station_id: station_id
               }, function(data) {
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                   showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
@@ -1424,6 +1309,7 @@ $mnu = 'menu_sale';
     });
 
     $(document).on('click', '#btn_sale_additem', function(e) {
+
       e.preventDefault();
       var txt_item = $('#txt_sale_additem').val();
       var buyer_type = $('#txt_sale_buyer').val();
@@ -1442,7 +1328,8 @@ $mnu = 'menu_sale';
           action: 1,
           qty: qty,
           item_code: item_code,
-          buyer_type: buyer_type
+          buyer_type: buyer_type,
+          station_id: station_id
         }, function(data) {
           $("#loading").modal('hide');
 

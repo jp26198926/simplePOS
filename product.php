@@ -11,21 +11,10 @@ $mnu = 'menu_product';
     <title><?= $app_name; ?></title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="./assets/css/jquery-ui.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="./assets/css/vendor.css">
-    <link rel="stylesheet" type="text/css" href="./assets/css/flat-admin.css">
-
-    <!-- Theme -->
-    <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue-sky.css">
-    <link rel="stylesheet" type="text/css" href="./assets/css/theme/blue.css">
-    <link rel="stylesheet" type="text/css" href="./assets/css/theme/red.css">
-    <link rel="stylesheet" type="text/css" href="./assets/css/theme/yellow.css">
-
-    <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap-dialog.css">
-
-    <!-- Quotes -->
-    <link rel="stylesheet" type="text/css" href="./assets/css/qoutes.css">
+    <?php
+        include("layout_style.php");
+    ?>
 
     <style>
     #tbl_receiving_list * {
@@ -300,12 +289,12 @@ $mnu = 'menu_product';
                                                                 <?php
                                                                 /*
                                                                     include('connect.php');
-                                                                    
+
                                                                     include('query_uom.php');
                                                                     $sql .= ' ORDER BY uom;';
-                                                                    
+
                                                                     include('pop_uom.php');
-                                                                    
+
                                                                     $mysqli->close();
                                                                     */
                                                                 ?>
@@ -337,12 +326,12 @@ $mnu = 'menu_product';
                                                                 <?php
                                                                 /*
                                                                     include('connect.php');
-                                                                    
+
                                                                     include('query_supplier.php');
                                                                     $sql .= ' ORDER BY supplier;';
-                                                                    
+
                                                                     include('pop_supplier.php');
-                                                                    
+
                                                                     $mysqli->close();
                                                                     */
                                                                 ?>
@@ -374,12 +363,12 @@ $mnu = 'menu_product';
                                                                 <?php
                                                                 /*
                                                                     include('connect.php');
-                                                                    
+
                                                                     include('query_buyer.php');
                                                                     $sql .= ' ORDER BY buyer;';
-                                                                    
+
                                                                     include('pop_buyer.php');
-                                                                    
+
                                                                     $mysqli->close();
                                                                     */
                                                                 ?>
@@ -426,7 +415,7 @@ $mnu = 'menu_product';
                                                                 echo "<tbody>";
 
                                                                 echo "  <td colspan='{$buyer_count}'>Use Search Field Above to Show List</td>";
-                                                               
+
                                                                 $mysqli->close();
 
                                                                 echo "</tbody>";
@@ -460,12 +449,12 @@ $mnu = 'menu_product';
                                                                 <?php
                                 /*
                                     include('connect.php');
-                                    
+
                                     include('query_category.php');
                                     $sql .= ' ORDER BY category;';
-                                    
+
                                     include('pop_category.php');
-                                    
+
                                     $mysqli->close();
                                     */
                                 ?>
@@ -497,12 +486,12 @@ $mnu = 'menu_product';
                                                                 <?php
                                 /*
                                     include('connect.php');
-                                    
+
                                     include('query_payment_type.php');
                                     $sql .= ' ORDER BY payment_type;';
-                                    
+
                                     include('pop_payment_type.php');
-                                    
+
                                     $mysqli->close();
                                     */
                                 ?>
@@ -530,17 +519,10 @@ $mnu = 'menu_product';
 
     </div>
 
-    <script type="text/javascript" src="./assets/js/vendor.js"></script>
-    <script type="text/javascript" src="./assets/js/app.js"></script>
-    <script type="text/javascript" src="./assets/js/changepass.js"></script>
-
-    <script src="./assets/js/jquery-ui.min.js"></script>
-
-    <script type="text/javascript" src="./assets/js/bootstrap-dialog.js"></script>
-    <script type="text/javascript" src="./assets/js/functions.js"></script>
     <?php
-  include('menu-active.php');
-  ?>
+        include("layout_script.php");
+        include('menu-active.php');
+    ?>
 
     <script>
     $(function() {
@@ -1233,7 +1215,7 @@ $mnu = 'menu_product';
                 })
                 break;
 
-            case 8: //payment_type type          
+            case 8: //payment_type type
                 $(".txt-payment_type").val("");
                 $("#win_payment_type_new").modal();
 
@@ -1315,7 +1297,7 @@ $mnu = 'menu_product';
                 action: 3,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_receiving_modify").modal('hide');
@@ -1626,7 +1608,7 @@ $mnu = 'menu_product';
                 action: 3,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_receiving_cancel_reason").modal('hide');
@@ -1792,7 +1774,7 @@ $mnu = 'menu_product';
                 action: 8,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_product_price").modal('hide');
@@ -2013,7 +1995,7 @@ $mnu = 'menu_product';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_product_modify").modal('hide');
@@ -2173,7 +2155,7 @@ $mnu = 'menu_product';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_supplier_modify").modal('hide');
@@ -2336,7 +2318,7 @@ $mnu = 'menu_product';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_uom_modify").modal('hide');
@@ -2527,7 +2509,7 @@ $mnu = 'menu_product';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_buyer_modify").modal('hide');
@@ -3110,7 +3092,7 @@ $mnu = 'menu_product';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_category_modify").modal('hide');
@@ -3480,7 +3462,7 @@ $mnu = 'menu_product';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_payment_type_modify").modal('hide');
