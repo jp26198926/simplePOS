@@ -274,9 +274,10 @@ switch ($action) {
                 $trail_save = $mysqli->query($trail_query);
                 //end of Transaction Trail
 
-                $sql = "INSERT INTO pos_sale (dt,tran_id,product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,gst_percent,gst_value,tax_base)
-                            SELECT '{$dt}',{$tran_id},product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,{$gst_percent},((total/{$divisor})*{$gst}), (total/{$divisor})
-                            FROM pos_sale_temp;";
+                $sql = "INSERT INTO pos_sale (dt,tran_id,product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,gst_percent,gst_value,tax_base, station_id)
+                            SELECT '{$dt}',{$tran_id},product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,{$gst_percent},((total/{$divisor})*{$gst}), (total/{$divisor}), {$station_id}
+                            FROM pos_sale_temp
+                            WHERE station_id={$station_id};";
 
                 $exec = $mysqli->query($sql);
                 if ($exec) {
@@ -306,7 +307,8 @@ switch ($action) {
                                         b.type as buyer_type
                                 FROM pos_sale_temp i
                                 LEFT JOIN pos_product p ON p.id=i.product_id
-                                LEFT JOIN pos_buyer b ON b.id=i.buyer_id;";
+                                LEFT JOIN pos_buyer b ON b.id=i.buyer_id
+                                WHERE i.station_id={$station_id};";
 
                     $pop = $mysqli->query($sql);
 

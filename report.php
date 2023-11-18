@@ -212,7 +212,7 @@ $mnu = 'menu_report';
                                                                     <th>Receipt No.</th>
                                                                     <th>DateTime</th>
                                                                     <!--
-                                                                      <th>Sub-Total</th>                                    
+                                                                      <th>Sub-Total</th>
                                                                       <th>Discount</th>
                                                                     -->
                                                                     <th>Payment Type</th>
@@ -381,6 +381,14 @@ $mnu = 'menu_report';
                                             <div role="tabpanel" class="tab-pane" id="inventory">
                                                 <div class="card">
                                                     <div class="card-body no-padding" style='overflow: scroll;'>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="alert alert-success">
+                                                                    <i class="fa fa-info-circle"></i>
+                                                                    Use Advance Search
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-sm-4">
                                                             <label>Product Search</label>
                                                             <input type='text' id="txt_inventory_search"
@@ -806,6 +814,15 @@ $mnu = 'menu_report';
 
     });
 
+    $(document).on("click", "#txt_inventory_ending, #txt_inventory_search",function(){
+        $(".txt-inventory-asearch").val("");
+        $("#win_inventory_asearch").modal();
+
+        $('#win_inventory_asearch').on('shown.bs.modal', function() {
+            $('#txt_inventory_asearch_product').focus().select();
+        });
+    });
+
     $(document).on("click", "#btn_inventory_asearch", function(e) {
         e.preventDefault();
         var product = $("#txt_inventory_asearch_product").val();
@@ -1187,7 +1204,7 @@ $mnu = 'menu_report';
                 title: "<b style='color:grey;'>Simple POS </b>",
                 message: txt,
                 type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
-                closable: true, // <-- Default value is false                
+                closable: true, // <-- Default value is false
                 btnOKLabel: 'Proceed', // <-- Default value is 'OK',
                 btnOKClass: 'btn-success', // <-- If you didn't specify it, dialog type will be used,
                 btnCancelClass: 'btn-warning', // <-- If you didn't specify it, dialog type will be used,
@@ -1765,7 +1782,7 @@ $mnu = 'menu_report';
                 action: 3,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_receiving_modify").modal('hide');
@@ -2045,7 +2062,7 @@ $mnu = 'menu_report';
                 action: 3,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_receiving_cancel_reason").modal('hide');
@@ -2209,7 +2226,7 @@ $mnu = 'menu_report';
                 action: 8,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_product_price").modal('hide');
@@ -2426,7 +2443,7 @@ $mnu = 'menu_report';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_product_modify").modal('hide');
@@ -2582,7 +2599,7 @@ $mnu = 'menu_report';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_supplier_modify").modal('hide');
@@ -2745,7 +2762,7 @@ $mnu = 'menu_report';
                 action: 4,
                 id: id
             }, function(data) {
-                //$("#loading").modal('hide');         
+                //$("#loading").modal('hide');
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_uom_modify").modal('hide');

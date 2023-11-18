@@ -4,6 +4,7 @@
 
 <script type="text/javascript" src="./assets/js/bootstrap-dialog.js"></script>
 <script type="text/javascript" src="./assets/js/functions.js"></script>
+<script type="text/javascript" src="./assets/js/jquery-ui.min.js"></script>
 
 <script type="text/javascript" src="./assets/js/jquery.number.js"></script>
 

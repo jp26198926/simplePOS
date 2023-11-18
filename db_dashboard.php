@@ -78,10 +78,10 @@ switch ($action) {
         //         WHERE (s.dt >= '{$dt_start}' AND s.dt <= '{$dt_end}') AND s.status_id=1
         //         GROUP by HOUR(s.dt);";
 
-        $sql = "select (HOUR(s.dt) + 1) as hrs, SUM(total) as total FROM pos_sale s
-                    WHERE (s.dt BETWEEN '{$dt_start}' AND '{$dt_end}') AND s.status_id=1
-                    GROUP by HOUR(s.dt);";
-
+        $sql = "SELECT (HOUR(s.dt) + 1) AS hrs, SUM(s.total) AS total
+                FROM pos_sale s
+                WHERE (s.dt BETWEEN '{$dt_start}' AND '{$dt_end}') AND s.status_id = 1
+                GROUP BY (HOUR(s.dt) + 1);";
 
         $pop = $mysqli->query($sql);
         if ($pop) {

@@ -207,15 +207,18 @@ $mnu = 'menu_product';
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                                <tr>
+                                                                    <td align="center" colspan="7"> Use search to show products </td>
+                                                                </tr>
                                                                 <?php
-                                                                  include('connect.php');
+                                                                //   include('connect.php');
 
-                                                                  include('query_product.php');
-                                                                  $sql .= ' ORDER BY p.product_name;';
+                                                                //   include('query_product.php');
+                                                                //   $sql .= ' ORDER BY p.product_name;';
 
-                                                                  include('pop_product.php');
+                                                                //   include('pop_product.php');
 
-                                                                  $mysqli->close();
+                                                                //   $mysqli->close();
                                                                 ?>
                                                             </tbody>
                                                         </table>
