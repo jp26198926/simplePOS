@@ -379,11 +379,13 @@
             $sql .= "AND CONCAT(u.lname,', ',u.fname,' ',u.mname) LIKE '%{$cashier}%' ";
 
             if ($dtFrom){
-                $sql .= "AND DATE(t.dt) >= '{$dtFrom}' ";
+                // $sql .= "AND DATE(t.dt) >= '{$dtFrom}' ";
+                $sql .= "AND t.dt >= '{$dtFrom}' ";
             }
 
             if ($dtTo){
-                $sql .= "AND DATE(t.dt) <= '{$dtTo}' ";
+                //$sql .= "AND DATE(t.dt) <= '{$dtTo}' ";
+                $sql .= "AND t.dt <= '{$dtTo}' ";
             }
 
             if ($status_id){

@@ -12,6 +12,7 @@ $mnu = 'menu_report';
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="./assets/css/jquery-ui.min.css" rel="stylesheet">
+    <link rel="./assets/css/jquery-ui-timepicker-addon.min.css">
 
     <link rel="stylesheet" type="text/css" href="./assets/css/vendor.css">
     <link rel="stylesheet" type="text/css" href="./assets/css/flat-admin.css">
@@ -255,7 +256,7 @@ $mnu = 'menu_report';
                                                             style="font: 90% Trebuchet MS; ">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>Date</th>
+                                                                    <th>DateTime</th>
                                                                     <th>Receipt #</th>
                                                                     <th>Product Code</th>
                                                                     <th>Product Name</th>
@@ -554,6 +555,8 @@ $mnu = 'menu_report';
     <script type="text/javascript" src="./assets/js/changepass.js"></script>
 
     <script src="./assets/js/jquery-ui.min.js"></script>
+    <script src="./assets/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="./assets/js/jquery-ui-timepicker-addon-i18n.min.js"></script>
 
     <script type="text/javascript" src="./assets/js/bootstrap-dialog.js"></script>
     <script type="text/javascript" src="./assets/js/functions.js"></script>
@@ -561,16 +564,26 @@ $mnu = 'menu_report';
     <script type="text/javascript" src="./assets/js/printThis.js"></script>
 
     <?php
-  include('menu-active.php');
-  ?>
+        include('menu-active.php');
+    ?>
 
     <script>
     $(function() {
+        /*
         $(".datepicker").datepicker({
             changeMonth: true,
             changeYear: true,
         });
         $(".datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+        */
+        $(`.datepicker`).datetimepicker({
+            dateFormat: `yy-mm-dd`,
+            timeFormat: `HH:mm`, // Define your preferred time format
+            changeMonth: true,
+            changeYear: true,
+            yearRange: `c-100:c+10`,
+        });
+
     });
 
     function str_pad(str, max, string_pad) {

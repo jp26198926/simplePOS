@@ -9,3 +9,5 @@ $address = "Lae City, PNG";
 $tin_no = "000000000";
 $gst_percent = 10; //10 percent
 $show_gst = true;
+$home_folder = "simplePOS"; //the name of the folder where all codes reside
+
