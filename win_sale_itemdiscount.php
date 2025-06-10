@@ -11,6 +11,7 @@
 				<input type='hidden' id='hidden_sale_itemprice' />
 				<input type='hidden' id='hidden_sale_itemtotal' />
 				<input type='hidden' id='hidden_sale_discount_itemtotal' />
+				<input type='hidden' id='hidden_sale_gst_type_id' />
 			</div>   
             <div class="modal-body">
 				<div class='row'>

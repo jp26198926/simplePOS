@@ -100,6 +100,7 @@
 								<th>Buyer Type</th>
 								<th>Price</th>
 								<th>Discount</th>
+								<th>GST</th>
 								<th>Total</th>
 							</tr>
 						</thead>

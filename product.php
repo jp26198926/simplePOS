@@ -155,30 +155,53 @@ $mnu = 'menu_product';
 
                                         <!-- Nav tabs -->
                                         <ul class="nav nav-tabs" role="tablist">
-                                            <li id="1" role="presentation" class="tab_product active"><a href="#product"
-                                                    aria-controls="product" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-cube fa-fw'></i>Product</a></li>
-                                            <li id="2" role="presentation" class="tab_product"><a href="#receiving"
-                                                    aria-controls="receiving" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-download fa-fw'></i>Receiving</a></li>
-                                            <li id="3" role="presentation" class="tab_product"><a href="#uom"
-                                                    aria-controls="uom" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-random fa-fw'></i>UOM</a></li>
-                                            <li id="4" role="presentation" class="tab_product"><a href="#supplier"
-                                                    aria-controls="supplier" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-truck fa-fw'></i>Supplier</a></li>
-                                            <li id="5" role="presentation" class="tab_product"><a href="#buyer"
-                                                    aria-controls="buyer" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-group fa-fw'></i>Buyer</a></li>
-                                            <li id="6" role="presentation" class="tab_product"><a href="#price"
-                                                    aria-controls="price" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-tags fa-fw'></i>Pricing</a></li>
-                                            <li id="7" role="presentation" class="tab_product"><a href="#category"
-                                                    aria-controls="category" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-list fa-fw'></i>Category</a></li>
-                                            <li id="8" role="presentation" class="tab_product"><a href="#payment_type"
-                                                    aria-controls="payment_type" role="tab" data-toggle="tab"><i
-                                                        class='fa fa-thumbs-up fa-fw'></i>Payment</a></li>
+                                            <li id="1" role="presentation" class="tab_product active">
+                                                <a href="#product" aria-controls="product" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-cube fa-fw'></i>Product
+                                                </a>
+                                            </li>
+                                            
+                                            <li id="2" role="presentation" class="tab_product">
+                                                <a href="#receiving" aria-controls="receiving" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-download fa-fw'></i>Receiving
+                                                </a>
+                                            </li>
+
+                                            <li id="3" role="presentation" class="tab_product">
+                                                <a href="#uom" aria-controls="uom" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-random fa-fw'></i>UOM
+                                                </a>
+                                            </li>
+
+                                            <li id="4" role="presentation" class="tab_product">
+                                                <a href="#supplier" aria-controls="supplier" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-truck fa-fw'></i>Supplier
+                                                </a>
+                                            </li>
+
+                                            <li id="5" role="presentation" class="tab_product">
+                                                <a href="#buyer" aria-controls="buyer" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-group fa-fw'></i>Buyer
+                                                </a>
+                                            </li>
+
+                                            <li id="6" role="presentation" class="tab_product">
+                                                <a href="#price" aria-controls="price" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-tags fa-fw'></i>Pricing
+                                                </a>
+                                            </li>
+
+                                            <li id="7" role="presentation" class="tab_product">
+                                                <a href="#category" aria-controls="category" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-list fa-fw'></i>Category
+                                                </a>
+                                            </li>
+
+                                            <li id="8" role="presentation" class="tab_product">
+                                                <a href="#payment_type" aria-controls="payment_type" role="tab" data-toggle="tab">
+                                                    <i class='fa fa-thumbs-up fa-fw'></i>Payment
+                                                </a>
+                                            </li>
 
                                         </ul>
 
@@ -200,6 +223,7 @@ $mnu = 'menu_product';
                                                                     <th>Stock</th>
                                                                     <th>UOM</th>
                                                                     <th>CATEGORY</th>
+                                                                    <th>GST TYPE
                                                                     <!--
                                                                     <th>Selling Price</th>
                                                                     -->
@@ -208,7 +232,7 @@ $mnu = 'menu_product';
                                                             </thead>
                                                             <tbody>
                                                                 <tr>
-                                                                    <td align="center" colspan="7"> Use search to show products </td>
+                                                                    <td align="center" colspan="8"> Use search to show products </td>
                                                                 </tr>
                                                                 <?php
                                                                 //   include('connect.php');
@@ -1934,9 +1958,10 @@ $mnu = 'menu_product';
         var product_name = $("#txt_product_name_update").val();
         var product_uom = $("#txt_product_uom_update").val();
         var product_category = $("#txt_product_category_update").val();
+        const product_gst_type = $("#txt_product_gst_type_update").val();
 
         if (id) {
-            if (product_code && product_name && product_uom && product_category) {
+            if (product_code && product_name && product_uom && product_category && product_gst_type) {
 
                 $(".buttons_show, .error_show, .modal-body").css("display", "none");
                 $(".progress_show").css("display", "block");
@@ -1947,14 +1972,14 @@ $mnu = 'menu_product';
                     product_code: product_code,
                     product_name: product_name,
                     product_uom: product_uom,
-                    product_category: product_category
+                    product_category: product_category,
+                    product_gst_type: product_gst_type
                 }, function(data) {
                     $(".buttons_show, .modal-body").css("display", "block");
                     $(".progress_show, .error_show").css("display", "none");
 
                     if (data.indexOf("<!DOCTYPE html>") > -1) {
-                        showError('Simple POS',
-                            "Error: Session Time-Out, You must login again to continue.");
+                        showError('Simple POS',"Error: Session Time-Out, You must login again to continue.");
                         location.reload(true);
                     } else if (data.indexOf("Error: ") > -1) {
                         $(".error_show").css("display", "block");
@@ -2003,28 +2028,24 @@ $mnu = 'menu_product';
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
                     $("#win_product_modify").modal('hide');
 
-                    showError('Simple POS',
-                        "Error: Session Time-Out, You must login again to continue.");
+                    showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
                     location.reload(true);
                 } else if (data.indexOf("Error: ") > -1) {
                     $("#win_product_modify").modal('hide');
 
                     showError('Simple POS', data);
                 } else {
-                    var product_code = data.split(":|:")[0];
-                    var product_name = data.split(":|:")[1];
-                    var product_uom = data.split(":|:")[2];
-                    var product_category = data.split(":|:")[3];
+                    const product = JSON.parse(data); 
 
                     $(".hidden_product_id").val(id);
-                    $("#txt_product_code_update").val(product_code);
-                    $("#txt_product_name_update").val(product_name);
-                    $("#txt_product_uom_update").val(product_uom);
-                    $("#txt_product_category_update").val(product_category);
+                    $("#txt_product_code_update").val(product.product_code);
+                    $("#txt_product_name_update").val(product.product_name);
+                    $("#txt_product_uom_update").val(product.product_uom);
+                    $("#txt_product_category_update").val(product.category_id);
+                    $("#txt_product_gst_type_update").val(product.gst_type_id);
 
                     $(".buttons_show, .modal-body").css("display", "block");
                     $(".progress_show, .error_show").css("display", "none");
-                    //$("#win_product_modify").modal();
                 }
             });
         } else {
@@ -2038,12 +2059,14 @@ $mnu = 'menu_product';
 
     $(document).on('click', '#btn_product_save', function(e) {
         e.preventDefault();
-        var product_code = $("#txt_product_code").val();
-        var product_name = $("#txt_product_name").val();
-        var product_uom = $("#txt_product_uom").val();
-        var product_category = $("#txt_product_category").val();
+        const product_code = $("#txt_product_code").val();
+        const product_name = $("#txt_product_name").val();
+        const product_uom = $("#txt_product_uom").val();
+        const product_category = $("#txt_product_category").val();
 
-        if (product_code && product_name && product_uom && product_category) {
+        const product_gst_type = $("#txt_product_gst_type").val();
+
+        if (product_code && product_name && product_uom && product_category && product_gst_type) {
 
             $(".buttons_show, .error_show, .modal-body").css("display", "none");
             $(".progress_show").css("display", "block");
@@ -2053,14 +2076,14 @@ $mnu = 'menu_product';
                 product_code: product_code,
                 product_name: product_name,
                 product_uom: product_uom,
-                product_category: product_category
+                product_category: product_category,
+                product_gst_type: product_gst_type
             }, function(data) {
                 $(".buttons_show, .modal-body").css("display", "block");
                 $(".progress_show, .error_show").css("display", "none");
 
                 if (data.indexOf("<!DOCTYPE html>") > -1) {
-                    showError('Simple POS',
-                        "Error: Session Time-Out, You must login again to continue.");
+                    showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
                     location.reload(true);
                 } else if (data.indexOf("Error: ") > -1) {
                     $(".error_show").css("display", "block");

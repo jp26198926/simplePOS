@@ -9,7 +9,9 @@ $sql = "SELECT s.id as id, s.dt, s.tran_id as tran_id, CONCAT(DATE_FORMAT(s.dt, 
                     st.status as status,
                     b.type as buyer_type,
                     c.category,
-                    pt.payment_type
+                    pt.payment_type,
+                    s.gst_type_id, s.tax_base, s.gst_value,
+                    g.gst_code, g.gst_type
             FROM (((pos_sale s
             LEFT JOIN (pos_product p
                         LEFT JOIN pos_uom u ON u.id=p.product_uom
@@ -19,4 +21,5 @@ $sql = "SELECT s.id as id, s.dt, s.tran_id as tran_id, CONCAT(DATE_FORMAT(s.dt, 
             LEFT JOIN pos_sale_status st ON st.id=s.status_id)
             LEFT JOIN pos_buyer b ON b.id=s.buyer_id
             LEFT JOIN pos_transaction t ON t.id=s.tran_id
-            LEFT JOIN pos_payment_type pt ON pt.id=t.payment_type_id ";
+            LEFT JOIN pos_payment_type pt ON pt.id=t.payment_type_id
+            LEFT JOIN pos_gst_type g ON g.id=p.gst_type_id ";

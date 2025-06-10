@@ -31,12 +31,19 @@ if ($pop) {
 
             $total = number_format(floatval($row->total), 2, '.', ',');
 
-            $t_total = floatval($row->total);
-            $t_taxbase = $t_total / 1.1;
-            $t_gst = $t_taxbase * 0.1;
+            // $t_total = floatval($row->total);
+            // $t_taxbase = $t_total / 1.1;
+            // $t_gst = $t_taxbase * 0.1;
+            $gst_type_id = $row->gst_type_id;
+            $tax_base = $row->tax_base;
+            $gst_value = $row->gst_value;
+            $gst_code = $row->gst_code;
+            $gst_type = $row->gst_type;
 
-            $taxbase = number_format(($t_taxbase), 2, '.', ',');
-            $gst = number_format(($t_gst), 2, '.', ',');
+            // $taxbase = number_format(($t_taxbase), 2, '.', ',');
+            // $gst = number_format(($t_gst), 2, '.', ',');
+            $taxbase = number_format(($tax_base), 2, '.', ',');
+            $gst = number_format(($gst_value), 2, '.', ',');
 
 
             $status_id = $row->status_id;
@@ -66,10 +73,12 @@ if ($pop) {
                 echo "<td align='center'>{$discount_qty}</td>";
                 echo "<td align='right'>{$discount_total}</td>";
                 */
-
-            echo "<td align='right'>{$total}</td>";
+            echo "<td align='right'>{$discount_total}</td>";
+            echo "<td align='center'>{$gst_code}</td>";
+            
             echo "<td align='right'>{$taxbase}</td>";
             echo "<td align='right'>{$gst}</td>";
+            echo "<td align='right'>{$total}</td>";
             //if ($status_id==2){
             //    echo "<td><a id='{$id}' href='#' class='transaction_cancelled_info' data-toggle='popover'  data-content='Show Info.'>{$status}</a></td>";
             //}else{

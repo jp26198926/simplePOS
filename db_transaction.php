@@ -169,12 +169,15 @@
                         echo ":~:|:~:";
 
                         //to be printed on receipt
-                        $sql = "SELECT i.qty as qty, i.current_price as price, i.discount_total as discount, i.total as total,
+                        $sql = "SELECT i.qty as qty, i.current_price as price, i.discount_total as discount, 
+                                        i.total as total, i.gst_type_id, i.gst_value,
                                         p.product_name as product,
-                                        b.type as buyer_type
-                                FROM (`pos_sale` i
-                                LEFT JOIN pos_product p ON p.id=i.product_id)
+                                        b.type as buyer_type,
+                                        g.gst_code, g.gst_type
+                                FROM `pos_sale` i
+                                LEFT JOIN pos_product p ON p.id=i.product_id
                                 LEFT JOIN pos_buyer b ON b.id=i.buyer_id
+                                LEFT JOIN pos_gst_type g ON g.id=i.gst_type_id
                                 WHERE i.tran_id={$tran_id};";
 
                         $pop = $mysqli->query($sql);
@@ -191,6 +194,11 @@
                             $i_discount=$item->discount;
                             $i_total=$item->total;
 
+                            $i_gst_value = $item->gst_value;
+                            $i_gst_type_id = $item->gst_type_id;
+                            $i_gst_code = $item->gst_code;
+                            $i_gst_type = ($i_gst_type_id==2) ? $i_gst_value : $item->gst_type;
+
                             echo "<tr>";
                             echo "  <td>{$i}</td>";
                             echo "  <td align='center'>{$i_qty}</td>";
@@ -198,6 +206,7 @@
                             echo "  <td align='center'>{$i_buyer}</td>";
                             echo "  <td align='right'>{$i_price}</td>";
                             echo "  <td align='right'>{$i_discount}</td>";
+                            echo "  <td align='center'>{$i_gst_type}</td>";
                             echo "  <td align='right'>{$i_total}</td>";
                             echo "</tr>";
                         }
@@ -270,12 +279,15 @@
                         echo $receipt_no . ":~|~:" . $cashier . ":~|~:" . $tran_dt . ":~|~:"  ;
 
                         //to be printed on receipt
-                        $sql = "SELECT i.qty as qty, i.current_price as price, i.discount_total as discount, i.total as total,
+                        $sql = "SELECT i.qty as qty, i.current_price as price, i.discount_total as discount, 
+                                        i.total as total, i.gst_type_id, i.gst_value, i.tax_base,
                                         p.product_name as product,
-                                        b.type as buyer_type
-                                FROM (`pos_sale` i
-                                LEFT JOIN pos_product p ON p.id=i.product_id)
+                                        b.type as buyer_type,
+                                        g.gst_code, g.gst_type
+                                FROM `pos_sale` i
+                                LEFT JOIN pos_product p ON p.id=i.product_id
                                 LEFT JOIN pos_buyer b ON b.id=i.buyer_id
+                                LEFT JOIN pos_gst_type g ON g.id=i.gst_type_id
                                 WHERE i.tran_id={$tran_id};";
 
                         $pop = $mysqli->query($sql);
@@ -289,6 +301,16 @@
 
                             $i_buyer= strtoupper(substr($item->buyer_type . '',0,1));
 
+                            $i_gst_value = $item->gst_value;
+                            $i_gst_type_id = $item->gst_type_id;
+                            // $i_gst_code = ($i_gst_type_id == 2) ? $i_gst_value : $item->gst_code;
+                            $i_gst_type = $item->gst_type;
+
+                            //if product gst is not zero rated then show tax base
+                            if (intval($i_gst_type_id) !== 3){
+                                $i_price = $item->tax_base;
+                            }
+
                             echo "<tr>";
                             echo "  <td align='left' colspan='4'>{$i_product} ({$i_buyer})</td>";
                             echo "  <td align='right'>{$i_total}</td>";
@@ -298,7 +320,8 @@
                             echo "  <td align='center'>@</td>";
                             echo "  <td align='left'>{$i_price}</td>";
                             //echo "  <td align='left'>Discount : {$i_discount}</td>";
-                            echo "  <td></td>";
+                            // echo "  <td>GST: {$i_gst_code}</td>";
+                            echo "  <td>GST: {$i_gst_value}</td>";
                             echo "</tr>";
                         }
 

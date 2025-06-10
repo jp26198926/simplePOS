@@ -271,9 +271,11 @@ $mnu = 'menu_report';
                                                                     <th>Discount Value</th>
                                                                     <th>Discount Total</th>
                                                                     -->
-                                                                    <th>Total</th>
+                                                                    <th>Discount</th>
+                                                                    <th>GST Type</th>
                                                                     <th>Tax Base</th>
-                                                                    <th>GST</th>
+                                                                    <th>GST</th>                                                                    
+                                                                    <th>Total</th>
                                                                     <th>Status</th>
                                                                 </tr>
                                                             </thead>
@@ -518,23 +520,29 @@ $mnu = 'menu_report';
             <hr />
 
             <div>
-                <table id="print_content" class='table' style='width:100%;'>
-
-                </table>
+                <table id="print_content" class='table' style='width:100%;'></table>
             </div>
 
             <hr />
 
             <div>
-                <table id="print_total" class='table' style='width:100%;'>
+                <table id="print_total" class='table' style='width:100%;'></table>
 
-                </table>
-
-                <table class='table' style='width:100%;'>
+                <!-- <table class='table' style='width:100%;'>
+                    <tr><td>GST:</td><td></td></tr>
                     <tr>
-                        <td align='center'>Amount above is GST Inclusive</td>
+                        <td></td>
+                        <td>E - GST Exclusive (Amount)</td>
                     </tr>
-                </table>
+                    <tr>
+                        <td></td>
+                        <td>I - GST Inclusive</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>0 - GST Zero Rated</td>            
+                    </tr>
+                </table> -->
             </div>
 
             <hr />

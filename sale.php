@@ -77,9 +77,9 @@ $mnu = 'menu_sale';
 
             <ul class="nav navbar-nav navbar-right">
 
-              <li>
+              <!-- <li>
                 <label id="lbl_sale_time" class=" alert alert-success"></label>
-              </li>
+              </li> -->
 
               <!-- <li class="dropdown notification danger">
                 <a class="btn_sale_lock dropdown-toggle" data-toggle="dropdown">
@@ -152,12 +152,13 @@ $mnu = 'menu_sale';
                     <th class='text-success text-center'>Type</th>
                     <th class='text-success text-right'>Price</th>
                     <th class='text-success text-center'>Discount</th>
+                    <th class='text-success text-center'>GST</th>
                     <th class='text-success text-right'>Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="7" class="text-center">No Product to Purchase Yet</td>
+                    <td colspan="8" class="text-center">No Product to Purchase Yet</td>
                   </tr>
                 </tbody>
               </table>
@@ -295,22 +296,28 @@ $mnu = 'menu_sale';
       <hr />
 
       <div>
-        <table id="print_content" class='table' style='width:100%;'>
-
-        </table>
+        <table id="print_content" class='table' style='width:100%;'></table>
       </div>
 
       <hr />
 
       <div>
-        <table id="print_total" class='table' style='width:100%;'>
-
-        </table>
-        <table class='table' style='width:100%;'>
+        <table id="print_total" class='table' style='width:100%;'></table>
+        <!-- <table class='table' style='width:100%;'>
+          <tr><td>GST:</td><td></td></tr>
           <tr>
-            <td align='center'>Amount above is GST Inclusive</td>
+            <td></td>
+            <td>E - GST Exclusive (Amount)</td>
           </tr>
-        </table>
+          <tr>
+            <td></td>
+            <td>I - GST Inclusive</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>0 - GST Zero Rated</td>            
+          </tr>
+        </table> -->
       </div>
 
       <hr />
@@ -358,20 +365,20 @@ $mnu = 'menu_sale';
       return discount_total;
     }
 
-    function serverTime() {
-      $.post("db_sale.php", {
-        action: 10
-      }, function(data) {
-        if (data.indexOf("<!DOCTYPE html>") > -1) {
-          showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
-          location.reload(true);
-        } else if (data.indexOf("Error: ") > -1) {
-          $("#lbl_sale_time").text("Disconnected");
-        } else {
-          $("#lbl_sale_time").text(data);
-        }
-      });
-    }
+    // function serverTime() {
+    //   $.post("db_sale.php", {
+    //     action: 10
+    //   }, function(data) {
+    //     if (data.indexOf("<!DOCTYPE html>") > -1) {
+    //       showError('<?= $app_name; ?>', "Error: Session Time-Out, You must login again to continue.");
+    //       location.reload(true);
+    //     } else if (data.indexOf("Error: ") > -1) {
+    //       $("#lbl_sale_time").text("Disconnected");
+    //     } else {
+    //       $("#lbl_sale_time").text(data);
+    //     }
+    //   });
+    // }
 
     function checkIfLock(callback) {
       $.post("db_sale.php", {
@@ -388,24 +395,24 @@ $mnu = 'menu_sale';
     $(document).ready(function() {
       station_id = Number($(".station_id").text());
 
-      setInterval(function() {
-        serverTime();
+      // setInterval(function() {
+      //   // serverTime();
 
-        checkIfLock(function(isLock) {
-          if (parseInt(isLock)) {
-            if (currentLock == 0) {
-              showLock('<?= $app_name; ?>', 'This module is currently block by a supervisor!');
-            }
-            currentLock = 1;
-          } else {
-            if (currentLock == 1) {
-              BootstrapDialog.closeAll();
-            }
-            currentLock = 0;
-          }
-        });
+      //   checkIfLock(function(isLock) {
+      //     if (parseInt(isLock)) {
+      //       if (currentLock == 0) {
+      //         showLock('<?= $app_name; ?>', 'This module is currently block by a supervisor!');
+      //       }
+      //       currentLock = 1;
+      //     } else {
+      //       if (currentLock == 1) {
+      //         BootstrapDialog.closeAll();
+      //       }
+      //       currentLock = 0;
+      //     }
+      //   });
 
-      }, 1000);
+      // }, 1000);
 
       $("#loading").modal();
 
@@ -841,10 +848,14 @@ $mnu = 'menu_sale';
 
     $(document).on('click', '#btn_sale_discount_itemsave', function(e) {
       e.preventDefault();
-      var id = $(".hidden_sale_itemid").val();
-      var type = $('#txt_sale_discount_itemtype').val();
-      var value = $('#txt_sale_discount_itemvalue').val();
-      var total = $("#hidden_sale_discount_itemtotal").val();
+      const id = $(".hidden_sale_itemid").val();
+      const qty = $("#hidden_sale_itemqty").val();
+      const price = $("#hidden_sale_itemprice").val();      
+      const gst_type_id = $("#hidden_sale_gst_type_id").val();
+
+      const type = $('#txt_sale_discount_itemtype').val();
+      const value = $('#txt_sale_discount_itemvalue').val();
+      const total = $("#hidden_sale_discount_itemtotal").val();
 
       if (id) {
 
@@ -857,7 +868,10 @@ $mnu = 'menu_sale';
           type: type,
           value: value,
           total: total,
-          station_id: station_id
+          station_id: station_id,
+          qty:qty,
+          price:price,
+          gst_type_id: gst_type_id
         }, function(data) {
           $(".progress_show, .error_show").css("display", "none");
           $(".buttons_show, .modal-body").css("display", "block");
@@ -966,26 +980,42 @@ $mnu = 'menu_sale';
             $("#win_sale_itemqty").modal('hide');
             showError('<?= $app_name; ?>', data);
           } else {
-            var qty = data.split(":~|~:")[0];
-            var uom = data.split(":~|~:")[1];
-            var price = data.split(":~|~:")[2];
-            var total = data.split(":~|~:")[3];
-            var discount_type = data.split(":~|~:")[4];
-            var discount_qty = data.split(":~|~:")[5];
-            var discount_total = data.split(":~|~:")[6];
+            const sale = JSON.parse(data);          
 
             $(".hidden_sale_itemid").val(id);
-            $("#hidden_sale_itemqty").val(qty);
-            $("#hidden_sale_itemprice").val(price);
-            $("#hidden_sale_itemtotal").val(total);
+            $("#hidden_sale_itemqty").val(sale.qty);
+            $("#hidden_sale_itemprice").val(sale.price);
+            $("#hidden_sale_itemtotal").val(sale.total);
+            $("#hidden_sale_gst_type_id").val(sale.gst_type_id);
 
-            $("#txt_sale_discount_itemtype").val(discount_type);
-            $("#txt_sale_discount_itemvalue").val(discount_qty);
-            $("#txt_sale_discount_itemtotal").val(discount_total);
+            $("#txt_sale_discount_itemtype").val(sale.discount_type);
+            $("#txt_sale_discount_itemvalue").val(sale.discount_qty);
+            $("#txt_sale_discount_itemtotal").val(sale.discount_total);
 
-            if (parseInt(discount_type) == 0) {
+            if (parseInt(sale.discount_type) == 0) {
               $("#txt_sale_discount_itemvalue").attr('disabled', 'disabled');
             }
+
+            // var qty = data.split(":~|~:")[0];
+            // var uom = data.split(":~|~:")[1];
+            // var price = data.split(":~|~:")[2];
+            // var total = data.split(":~|~:")[3];
+            // var discount_type = data.split(":~|~:")[4];
+            // var discount_qty = data.split(":~|~:")[5];
+            // var discount_total = data.split(":~|~:")[6];
+
+            // $(".hidden_sale_itemid").val(id);
+            // $("#hidden_sale_itemqty").val(qty);
+            // $("#hidden_sale_itemprice").val(price);
+            // $("#hidden_sale_itemtotal").val(total);
+
+            // $("#txt_sale_discount_itemtype").val(discount_type);
+            // $("#txt_sale_discount_itemvalue").val(discount_qty);
+            // $("#txt_sale_discount_itemtotal").val(discount_total);
+
+            // if (parseInt(discount_type) == 0) {
+            //   $("#txt_sale_discount_itemvalue").attr('disabled', 'disabled');
+            // }
 
             $(".buttons_show, .modal-body").css("display", "block");
             $(".progress_show, .error_show").css("display", "none");
@@ -1110,8 +1140,13 @@ $mnu = 'menu_sale';
             $("#win_sale_itemqty").modal('hide');
             showError('<?= $app_name; ?>', data);
           } else {
-            var qty = data.split(":~|~:")[0];
-            var uom = data.split(":~|~:")[1];
+            const sale = JSON.parse(data);
+
+            // var qty = data.split(":~|~:")[0];
+            // var uom = data.split(":~|~:")[1];
+
+            const qty = sale.qty;
+            const uom = sale.uom;
 
             $(".hidden_sale_itemid").val(id);
             $("#txt_sale_itemqty").val(qty).focus().select();
@@ -1311,11 +1346,11 @@ $mnu = 'menu_sale';
     $(document).on('click', '#btn_sale_additem', function(e) {
 
       e.preventDefault();
-      var txt_item = $('#txt_sale_additem').val();
-      var buyer_type = $('#txt_sale_buyer').val();
+      const txt_item = $('#txt_sale_additem').val();
+      const buyer_type = $('#txt_sale_buyer').val();
 
-      var qty = 1;
-      var item_code = txt_item;
+      let qty = 1;
+      let item_code = txt_item;
 
       if (txt_item.indexOf("*") > -1) {
         qty = txt_item.split("*")[0];
@@ -1324,6 +1359,7 @@ $mnu = 'menu_sale';
 
       if (item_code && buyer_type) {
         $("#loading").modal();
+        
         $.post("db_sale.php", {
           action: 1,
           qty: qty,

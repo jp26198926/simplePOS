@@ -28,11 +28,12 @@ switch ($action) {
         $product_name = $mysqli->real_escape_string(trim($_POST['product_name']) . '');
         $product_uom = $_POST['product_uom'];
         $product_category = $_POST['product_category'];
+        $product_gst_type = $_POST['product_gst_type'];
 
-        if ($product_code && $product_name && $product_uom && $product_category) {
+        if ($product_code && $product_name && $product_uom && $product_category && $product_gst_type) {
 
-            $sql = "INSERT INTO pos_product (product_code, product_name, product_uom, category_id)
-                        VALUES ('{$product_code}','{$product_name}',$product_uom, $product_category);";
+            $sql = "INSERT INTO pos_product (product_code, product_name, product_uom, category_id, gst_type_id)
+                        VALUES ('{$product_code}','{$product_name}',$product_uom, $product_category, $product_gst_type);";
 
             $exec = $mysqli->query($sql);
 
@@ -46,6 +47,8 @@ switch ($action) {
                 //end of Trail
 
                 include("query_product.php");
+
+                $sql .= " WHERE p.id={$product_id}";
 
                 $sql .= " ORDER BY p.product_name;";
 
@@ -65,12 +68,14 @@ switch ($action) {
         $product_name = $mysqli->real_escape_string(trim($_POST['product_name']) . '');
         $product_uom = $_POST['product_uom'];
         $product_category = $_POST['product_category'];
+        $product_gst_type = $_POST['product_gst_type'];
 
         $sql = "UPDATE pos_product 
                 SET  product_code='{$product_code}', 
                     product_name='{$product_name}', 
                     product_uom={$product_uom},
-                    category_id={$product_category}
+                    category_id={$product_category},
+                    gst_type_id={$product_gst_type}
                 WHERE id={$id};";
 
         $exec = $mysqli->query($sql);
@@ -97,19 +102,15 @@ switch ($action) {
     case 4: //get info
         $id = $_POST['id'];
         if ($id) {
-            $sql = "SELECT product_code,product_name,product_uom,category_id FROM pos_product WHERE id={$id};";
+            $sql = "SELECT product_code,product_name,product_uom,category_id, gst_type_id FROM pos_product WHERE id={$id};";
 
             $exec = $mysqli->query($sql);
 
             if ($exec) {
                 $row = $exec->fetch_object();
 
-                $product_code = $row->product_code;
-                $product_name = $row->product_name;
-                $product_uom = $row->product_uom;
-                $product_category = $row->category_id;
+                echo json_encode($row);
 
-                echo $product_code . ":|:" . $product_name . ":|:" . $product_uom . ":|:" . $product_category;
             } else {
                 echo "Error: " . $mysqli->error;
             }

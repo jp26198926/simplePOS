@@ -65,6 +65,30 @@
 						</select>
 					</div>
 				</div>
+
+				<div class='row'>
+					<div class='col-md-4'>
+						<label style='margin-top: 0.5em;font-weight: normal;'>GST Type <span style='color:red'>*</span></label>
+						<select id='txt_product_gst_type_update' class='form-control txt-product'>
+							<option value='0'> -- UOM -- </option>
+							<?php
+							include('connect.php');
+							$sql = "Select * from pos_gst_type order by gst_type;";
+							$exec = $mysqli->query($sql);
+							if ($exec) {
+								while ($row = $exec->fetch_object()) {
+									$id = $row->id;									
+									$label = $row->gst_type;
+									echo "<option value='{$id}'>{$label}</option>";
+								}
+							} else {
+								echo "Error: " . $mysqli->error;
+							}
+							$mysqli->close();
+							?>
+						</select>
+					</div>
+				</div>
 			</div>
 			<div class="modal-footer">
 				<div class="buttons_show pull-right">

@@ -102,7 +102,7 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                                 <th  rowspan=\"1\" width=\"15%\" ><b>PRODUCT NAME</b></th>
                                 
                                 
-                                <!--<th  rowspan=\"1\" width=\"23%\" ><b>PRODUCT NAME</b></th>-->
+                                <!--<th  rowspan=\"1\" width=\"15%\" ><b>PRODUCT NAME</b></th>-->
                                 <th  rowspan=\"1\" width=\"5%\" ><b>QTY</b></th>
                                 <th  rowspan=\"1\" width=\"5%\" ><b>UOM</b></th>                                
                                 
@@ -111,13 +111,14 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                                 <th  rowspan=\"1\" width=\"5%\" ><b>BUYER TYPE</b></th>
                                 <th  rowspan=\"1\" width=\"5%\" ><b>PMT TYPE</b></th>
                                 <th  rowspan=\"1\" width=\"5%\" ><b>PRICE</b></th>
+                                <th  rowspan=\"1\" width=\"5%\" ><b>DISCOUNT</b></th>
+                                <th  rowspan=\"1\" width=\"5%\" ><b>GST TYPE</b></th>                                
                                 
-                                
+                                <th  rowspan=\"1\" width=\"5%\" ><b>TAXBASE</b></th>
+                                <th  rowspan=\"1\" width=\"5%\" ><b>GST</b></th>
                                 <th  rowspan=\"1\" width=\"9%\" ><b>TOTAL</b></th>
-                                <th  rowspan=\"1\" width=\"8%\" ><b>TAXBASE</b></th>
-                                <th  rowspan=\"1\" width=\"8%\" ><b>GST</b></th>
                                 
-                                <th  rowspan=\"1\" width=\"7%\" ><b>STATUS</b></th>    
+                                <th  rowspan=\"1\" width=\"5%\" ><b>STATUS</b></th>    
                             </tr>
                         
                             ";
@@ -160,8 +161,11 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                 $total = number_format(floatval($row->total), 2, '.', ',');
 
                 $t_total = floatval($row->total);
-                $t_taxbase = $t_total / 1.1;
-                $t_gst = $t_taxbase * 0.1;
+                // $t_taxbase = $t_total / 1.1;
+                // $t_gst = $t_taxbase * 0.1;
+                $t_taxbase = $row->tax_base;
+                $t_gst = $row->gst_value;
+                $gst_code = $row->gst_code;
 
                 $total_qty += floatval($qty);
                 $total_total += $t_total;
@@ -184,18 +188,19 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
                 $tbl_list .=  "  <th align=\"center\" >" . $uom . "</th>";
                 $tbl_list .=  "  <th align=\"center\" >" . $category . "</th>";
                 $tbl_list .=  "  <th align=\"center\" >" . $buyer_type . "</th>";
-                $tbl_list .=  "  <th align=\"center\" >" . $payment_type . "</th>";
+                $tbl_list .=  "  <th align=\"center\" >" . $payment_type . "</th>";                
                 $tbl_list .=  "  <th align=\"right\" >" . $price . "</th>";
-
+                $tbl_list .=  "  <th align=\"right\" >" . $discount_total . "</th>";
+                $tbl_list .=  "  <th align=\"center\" >" . $gst_code . "</th>";
                 /*
                         $tbl_list .=  "  <th>" . $discount_type_word . "</th>";
                         $tbl_list .=  "  <th align=\"right\" >" . $discount_qty . "</th>";
                         $tbl_list .=  "  <th align=\"right\" >" . $discount_total . "</th>";
-                        */
-
-                $tbl_list .=  "  <th align=\"right\" >" . $total . "</th>";
+                        */   
+                
                 $tbl_list .=  "  <th align=\"right\" >" . $taxbase . "</th>";
                 $tbl_list .=  "  <th align=\"right\" >" . $gst . "</th>";
+                $tbl_list .=  "  <th align=\"right\" >" . $total . "</th>";
 
                 $tbl_list .=  "  <th>" . $status . "</th>";
                 $tbl_list .=  "</tr>";
@@ -204,18 +209,19 @@ if (!empty($_SESSION['sales_sql']) || $_SESSION['sales_sql'] != '') {
             $tbl_list .=  "<tr align=\"center\" >";
             $tbl_list .=  "  <th colspan=\"5\" align=\"left\" ><b>GRAND TOTAL</b></th>";
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_qty, 2, '.', ',') . "</b></th>";
-            $tbl_list .=  "  <th colspan=\"5\" ></th>";
-            $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_total, 2, '.', ',') . "</b></th>";
+            $tbl_list .=  "  <th colspan=\"7\" ></th>";
+            
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_taxbase, 2, '.', ',') . "</b></th>";
             $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_gst, 2, '.', ',') . "</b></th>";
+            $tbl_list .=  "  <th align=\"right\" ><b>" . number_format($total_total, 2, '.', ',') . "</b></th>";
 
             $tbl_list .=  "  <th></th>";
             $tbl_list .=  "</tr>";
         } else {
-            $tbl_list .= "<tr><td colspan=\"14\">No Record</td></tr>";
+            $tbl_list .= "<tr><td colspan=\"17\">No Record</td></tr>";
         }
     } else {
-        $tbl_list .= "<tr><td colspan=\"14\">" . $mysqli->error . "</td></tr>";
+        $tbl_list .= "<tr><td colspan=\"17\">" . $mysqli->error . "</td></tr>";
     }
 
     

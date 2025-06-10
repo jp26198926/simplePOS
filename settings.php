@@ -89,6 +89,19 @@ $mnu = 'menu_admin';
                   <input type="number" id="station_id" class="form-control" value="0" />
                 </div>
               </div>
+
+              <div class="row mt-3">
+                <div class="col-md-3 text-right">Allow GST Free </div>
+                <div class="col-md-9">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="allow_gst_free">
+                    <label class="form-check-label" for="allow_gst_free"></label>
+                  </div>
+                  <small id="allowFreeGstHelp" class="form-text text-muted">When checked, products marked as "GST Free" will have no GST applied.</small>
+                
+                </div>
+              </div>
+
             </div>
             <hr />
             <div class="card-footer" style="padding-bottom: 1em;">
@@ -116,329 +129,133 @@ $mnu = 'menu_admin';
 
   <script>
 
-    $(document).ready(function() {
+    async function loadSettings() {
+        try {
+            const response = await fetch('db_settings.php?action=1', { // Added action=1 to GET request
+                method: 'GET', // Assuming GET request for fetching data
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
 
-      $(document).on("click","#btn_settings_save", function(){
+            if (!response.ok) {
+                let errorText = `HTTP error! status: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.message) {
+                        errorText = errorData.message;
+                    }
+                } catch (e) {
+                     errorText = `HTTP error! status: ${response.status} - ${response.statusText}`;
+                }
+                throw new Error(`Failed to load settings: ${errorText}`);
+            }
+
+            const result = await response.json();
+
+            if (result && result.status === 'success' && result.data) {
+                // Assuming result.data is an object and contains allow_gst_free
+                const allowGstFreeValue = result.data.allow_gst_free;
+                if (allowGstFreeValue === '1' || allowGstFreeValue === 1) {
+                    $("#allow_gst_free").prop('checked', true);
+                } else {
+                    $("#allow_gst_free").prop('checked', false);
+                }
+                // You can also load and set station_id here if it's part of result.data
+                // For example: if(result.data.station_id) $("#station_id").val(result.data.station_id);
+            } else {
+                let message = "Could not parse settings data.";
+                if(result && result.message){
+                    message = result.message;
+                }
+                console.error('Error loading settings:', message);
+                // Optionally show an alert to the user
+                // $("#modal_alert_message").text("Error loading initial settings: " + message);
+                // $("#modal_alert").modal("show");
+            }
+
+        } catch (error) {
+            console.error('Failed to fetch initial settings:', error);
+            // Optionally show an alert to the user
+            // $("#modal_alert_message").text("Failed to load initial settings: " + error.message);
+            // $("#modal_alert").modal("show");
+        }
+    }
+
+    $(document).ready(function() {
+        loadSettings(); // Load settings when the document is ready
+
+        // Load station_id from local storage if it exists (existing functionality)
+        const storedStationId = getFromLocalStorage('station_id');
+        if (storedStationId) {
+            $("#station_id").val(storedStationId);
+            $(".station_id").text(storedStationId);
+        }
+    });
+
+    $(document).on("click","#btn_settings_save", async function(){ // Made the function async
         let station_id = $("#station_id").val();
+        let allow_gst_free_checked = $("#allow_gst_free").is(":checked");
+        let allow_gst_free_value = allow_gst_free_checked ? 1 : 0;
 
         //call function from assets/js/function.js
         saveToLocalStorage('station_id', station_id);
-        $(".station_id").text(station_id);
+        $(".station_id").text(station_id); // Assuming this updates some UI element
 
-        $("#modal_alert").modal("show");
+        const formData = new URLSearchParams();
+        formData.append('action', '2'); // Action for updating settings
+        formData.append('allow_gst_free', allow_gst_free_value); // Value from the checkbox
+        // If you want to save station_id to the database as well, add it here:
+        // formData.append('station_id', station_id); 
+        // And ensure your db_settings.php (case 2) handles it.
 
-      });
+        try {
+            const response = await fetch('db_settings.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            });
 
-      // $(document).on('keypress', '.txtuserupdate', function(e) {
-      //   if (e.which == 13) {
-      //     $("#btn_user_update").trigger('click');
-      //   }
-      // });
+            if (!response.ok) {
+                // Attempt to get a more specific error message from server if possible
+                let errorText = `HTTP error! status: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.message) {
+                        errorText = errorData.message;
+                    }
+                } catch (e) {
+                    // If response is not JSON or another error occurs during error parsing, stick with statusText or default
+                    errorText = `HTTP error! status: ${response.status} - ${response.statusText}`;
+                }
+                throw new Error(errorText);
+            }
 
-      // $(document).on("click", "#btn_user_update", function(e) {
-      //   e.preventDefault();
+            const data = await response.json(); // Parse the JSON response from the server
 
-      //   var id = $(".user_hidden_id").val();
-      //   var username = $("#txt_user_username_update").val();
-      //   var access = $("#txt_user_access_update").val();
+            let message = "An unexpected response occurred."; // Default message, changed from var to let
+            if (data) {
+                if (data.message) {
+                    message = data.message;
+                } else if (data.status === 'success') {
+                    message = "Settings saved successfully!";
+                } else if (data.status === 'error') {
+                    message = "Error saving settings: " + (data.message || "Unknown server error");
+                }
+            }
+            
+            // Assuming your modal_alert.php has an element with id="modal_alert_message"
+            $("#modal_alert_message").text(message);
+            $("#modal_alert").modal("show");
 
-      //   var lname = $("#txt_user_lname_update").val();
-      //   var fname = $("#txt_user_fname_update").val();
-      //   var mname = $("#txt_user_mname_update").val();
-
-      //   var email = $("#txt_user_email_update").val();
-      //   var dept = $("#txt_user_dept_update").val();
-
-      //   if (username && access && lname && fname && dept) {
-
-      //     $(".buttons_show, .error_show, .modal-body").css("display", "none");
-      //     $(".progress_show").css("display", "block");
-
-      //     $.post("db_user.php", {
-      //       action: 3,
-      //       id: id,
-      //       username: username,
-      //       access: access,
-      //       lname: lname,
-      //       fname: fname,
-      //       mname: mname,
-      //       email: email,
-      //       dept: dept
-      //     }, function(data) {
-
-      //       $(".buttons_show, .modal-body").css("display", "block");
-      //       $(".progress_show, .error_show").css("display", "none");
-
-      //       if (data.indexOf("<!DOCTYPE html>") > -1) {
-      //         //alert("Error: Session Time-Out, You must login again to continue.");
-      //         showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-      //         location.reload(true);
-      //       } else if (data.indexOf("Error: ") > -1) {
-      //         $(".error_show").css("display", "block");
-      //         $(".error_msg").text(data);
-      //         $("#txt_user_username_update").select().focus();
-      //       } else {
-      //         $("#tbl_user_list tbody").html(data);
-
-      //         $("#win_user_modify").modal('hide');
-
-      //         $('[data-toggle="tooltip"]').tooltip({
-      //           html: true
-      //         });
-      //       }
-
-      //     });
-
-      //   } else {
-      //     $(".error_show").css("display", "block");
-      //     $(".error_msg").text("Error: Required fields are important!");
-      //     $("#txt_user_username_update").select().focus();
-      //   }
-      // });
-
-      // $(document).on('click', '.btn_user_modify', function(e) {
-      //   e.preventDefault();
-      //   var id = $(this).attr('id');
-      //   if (id) {
-      //     $("#loading").modal();
-
-      //     $.post("db_user.php", {
-      //       action: 4,
-      //       id: id
-      //     }, function(data) {
-      //       $("#loading").modal('hide');
-
-      //       if (data.indexOf("<!DOCTYPE html>") > -1) {
-      //         //alert("Error: Session Time-Out, You must login again to continue.");
-      //         showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-      //         location.reload(true);
-      //       } else if (data.indexOf("Error: ") > -1) {
-      //         //alert(data);
-      //         showError('Simple POS', data);
-      //       } else {
-      //         var username = data.split(":|:")[0];
-      //         var fname = data.split(":|:")[1];
-      //         var lname = data.split(":|:")[2];
-      //         var mname = data.split(":|:")[3];
-      //         var dept_id = data.split(":|:")[4];
-      //         var email = data.split(":|:")[5];
-      //         var access = data.split(":|:")[6];
-
-      //         $(".user_hidden_id").val(id);
-      //         $("#txt_user_username_update").val(username);
-      //         $("#txt_user_access_update").val(access);
-      //         $("#txt_user_lname_update").val(lname);
-      //         $("#txt_user_fname_update").val(fname);
-      //         $("#txt_user_mname_update").val(mname);
-      //         $("#txt_user_email_update").val(email);
-      //         $("#txt_user_dept_update").val(dept_id);
-
-      //         $("#win_user_modify").modal();
-      //       }
-      //     })
-      //     //$("#win_user_modify").modal();
-      //   } else {
-      //     showError('Simple POS', "Error: Critical Error Encountered!");
-      //   }
-      // });
-
-      // $('#win_user_modify').on('shown.bs.modal', function() {
-      //   $('#txt_user_username_update').focus().select();
-      // })
-
-      // $(document).on("click", ".btn_user_deactivate", function(e) {
-      //   e.preventDefault();
-      //   var id = $(this).attr('id');
-      //   if (id) {
-      //     if (confirm("Are you sure you want to DE-ACTIVATE this user?")) {
-      //       $("#loading").modal();
-
-      //       $.post("db_user.php", {
-      //         action: 6,
-      //         status: 2,
-      //         id: id
-      //       }, function(data) {
-      //         $("#loading").modal('hide');
-
-      //         if (data.indexOf("<!DOCTYPE html>") > -1) {
-      //           //alert("Error: Session Time-Out, You must login again to continue.");
-      //           showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-      //           location.reload(true);
-      //         } else if (data.indexOf("Error: ") > -1) {
-      //           //alert(data);
-      //           showError('Simple POS', data);
-      //         } else {
-      //           $("#tbl_user_list tbody").html(data);
-
-      //           $('[data-toggle="tooltip"]').tooltip({
-      //             html: true
-      //           });
-      //         }
-      //       });
-      //     }
-      //   } else {
-      //     //alert("Error: Critical Error Encountered!");
-      //     showError('Simple POS', "Error: Critical Error Encountered!");
-      //   }
-      // });
-
-      // $(document).on("click", ".btn_user_activate", function(e) {
-      //   e.preventDefault();
-      //   var id = $(this).attr('id');
-      //   if (id) {
-      //     if (confirm("Are you sure you want to ACTIVATE this user?")) {
-      //       $("#loading").modal();
-
-      //       $.post("db_user.php", {
-      //         action: 6,
-      //         status: 1,
-      //         id: id
-      //       }, function(data) {
-      //         $("#loading").modal('hide');
-
-      //         if (data.indexOf("<!DOCTYPE html>") > -1) {
-      //           showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-      //           location.reload(true);
-      //         } else if (data.indexOf("Error: ") > -1) {
-      //           showError('Simple POS', data);
-      //         } else {
-      //           $("#tbl_user_list tbody").html(data);
-
-      //           $('[data-toggle="tooltip"]').tooltip({
-      //             html: true
-      //           });
-      //         }
-      //       });
-      //     }
-      //   } else {
-      //     //alert("Error: Critical Error Encountered!");
-      //     showError('Simple POS', "Error: Critical Error Encountered!");
-      //   }
-      // });
-
-      // $(document).on('keypress', '.txtuser', function(e) {
-      //   if (e.which == 13) {
-      //     $("#btn_user_save").trigger('click');
-      //   }
-      // });
-
-      // $(document).on("click", "#btn_user_save", function(e) {
-      //   e.preventDefault();
-
-      //   var username = $("#txt_user_username").val();
-      //   var pass = $("#txt_user_password").val();
-      //   var repass = $("#txt_user_repassword").val();
-      //   var access = $("#txt_user_access").val();
-
-      //   var lname = $("#txt_user_lname").val();
-      //   var fname = $("#txt_user_fname").val();
-      //   var mname = $("#txt_user_mname").val();
-
-      //   var email = $("#txt_user_email").val();
-      //   var dept = $("#txt_user_dept").val();
-
-      //   if (username && pass && repass && access && lname && fname && dept) {
-      //     if (pass === repass) {
-      //       $(".buttons_show, .error_show, .modal-body").css("display", "none");
-      //       $(".progress_show").css("display", "block");
-
-      //       $.post("db_user.php", {
-      //         action: 2,
-      //         username: username,
-      //         pass: pass,
-      //         repass: repass,
-      //         access: access,
-      //         lname: lname,
-      //         fname: fname,
-      //         mname: mname,
-      //         email: email,
-      //         dept: dept
-      //       }, function(data) {
-
-      //         $(".buttons_show, .modal-body").css("display", "block");
-      //         $(".progress_show, .error_show").css("display", "none");
-
-      //         if (data.indexOf("<!DOCTYPE html>") > -1) {
-      //           showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-      //           location.reload(true);
-      //         } else if (data.indexOf("Error: ") > -1) {
-      //           $(".error_show").css("display", "block");
-      //           $(".error_msg").text(data);
-      //           $("#txt_user_username").select().focus();
-      //         } else {
-      //           $("#tbl_user_list tbody").html(data);
-
-      //           $("#win_user_new").modal('hide');
-
-      //           $('[data-toggle="tooltip"]').tooltip({
-      //             html: true
-      //           });
-      //         }
-
-      //       });
-
-      //     } else {
-      //       $(".error_show").css("display", "block");
-      //       $(".error_msg").text("Error: Password does not match!");
-      //       $("#txt_user_username").select().focus();
-      //     }
-      //   } else {
-      //     $(".error_show").css("display", "block");
-      //     $(".error_msg").text("Error: Required fields are important!");
-      //     $("#txt_user_username").select().focus();
-      //   }
-      // });
-
-      // $(document).on("click", "#btn_add_user", function(e) {
-      //   e.preventDefault();
-      //   $("#win_user_new").modal();
-      //   $(".error_show, .progress_show").css("display", "none");
-      //   $(".buttons_show").css("display", "block");
-      // });
-
-      // $('#win_user_new').on('shown.bs.modal', function() {
-      //   $('#txt_user_username').focus();
-      // })
-
-      // $(document).on("keypress", "#txt_user_search", function(e) {
-      //   if (e.which == 13) {
-      //     $("#btn_user_search").trigger("click");
-      //   }
-      // })
-
-      // $(document).on("click", "#btn_user_search", function(e) {
-      //   e.preventDefault();
-
-      //   var txt_search = $("#txt_user_search").val();
-
-      //   $("#loading").modal();
-
-      //   $.post("db_user.php", {
-      //     action: 1,
-      //     mysearch: txt_search
-      //   }, function(data) {
-
-      //     $("#loading").modal('hide');
-
-      //     if (data.indexOf("<!DOCTYPE html>") > -1) {
-      //       showError('Simple POS', "Error: Session Time-Out, You must login again to continue.");
-      //       location.reload(true);
-      //     } else if (data.indexOf("Error: ") > -1) {
-      //       //alert(data);
-      //       showError('Simple POS', data);
-      //       $("#txt_user_search").focus().select();
-      //     } else {
-      //       $("#tbl_user_list tbody").html(data);
-
-      //       $("#txt_user_search").focus().select();
-
-      //       $('[data-toggle="tooltip"]').tooltip({
-      //         html: true
-      //       });
-      //     }
-      //   });
-
-      // })
+        } catch (error) {
+            console.error('Save Settings Error:', error);
+            // Display error message in the modal
+            $("#modal_alert_message").text("Failed to save settings: " + error.message);
+            $("#modal_alert").modal("show");
+        }
     });
   </script>
 

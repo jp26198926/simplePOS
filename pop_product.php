@@ -11,6 +11,8 @@ if ($pop) {
             $sale = floatval($row->sale);
             $uom = $row->product_uom;
             $category = $row->category;
+            $gst_code = $row->gst_code;
+            $gst_type = $row->gst_type;
             //$price = $row->price;
             $status_id = $row->status_id;
             $status = $row->status;
@@ -31,13 +33,14 @@ if ($pop) {
             echo "   <td align='center'>{$current_stock}</td>";
             echo "   <td align='center'>{$uom}</td>";
             echo "   <td align='center'>{$category}</td>";
+            echo "   <td align='center'>{$gst_type}</td>";
             //echo "   <td align='right'>{$price}</td>";
             echo "   <td align='center'>{$status}</td>";
             echo "</tr>";
         }
     } else {
         echo "<tr>";
-        echo "   <td colspan='7' align='center'>No Record Found</td>";
+        echo "   <td colspan='8' align='center'>No Record Found</td>";
         echo "</tr>";
     }
 } else {

@@ -1,0 +1,749 @@
+<?php
+include('validate.php');
+include('connect.php');
+include('config.php');
+
+$action = $_POST['action'];
+$station_id = isset($_POST['station_id']) ? $_POST['station_id'] : 0;
+
+switch ($action) {
+    case 1: //search code
+        $qty = floatval(trim($_POST['qty'] . ''));
+        $code = $mysqli->real_escape_string(trim($_POST['item_code'] . ''));
+        $buyer_type = intval($_POST['buyer_type']);
+
+        if ($qty && $code) {
+            $sql = "SELECT p.id as product_id, COALESCE(r.price,'0.00') as price,
+                        p.gst_type_id, g.gst_code, g.gst_type
+                        FROM pos_product p
+                        LEFT JOIN pos_price r ON r.product_id=p.id AND r.buyer_id={$buyer_type}
+                        LEFT JOIN pos_gst_type g ON g.id=p.gst_type_id
+                        WHERE p.product_code='{$code}';";
+
+            $exec = $mysqli->query($sql);
+            if ($exec) {
+                $product_count = $exec->num_rows;
+                if ($product_count > 0) {
+                    $row = $exec->fetch_object();
+
+                    $product_id = $row->product_id;                
+                    $price = floatval($row->price);
+                    $gst_type_id = $row->gst_type_id;
+                    $gst_code = $row->gst_code;
+                    $gst_type = $row->gst_type;
+
+                    //gst computation 2025-06-01
+                    $gst = floatval($gst_percent/100);
+                    $tax_base = 0;
+                    $gst_value = 0;
+                    $total = 0;
+
+                    $initial_total = $qty * $price;
+
+                    switch(intval($gst_type_id)){
+                        case 1: //inclusive (I)                            
+                            $divisor = 1 + $gst;
+                            $tax_base = floatval($initial_total) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
+                            $gst_value = $tax_base * $gst;
+                            $total = $initial_total;
+                            break;
+                        
+                        case 2: //exclusive (E)
+                            $tax_base = $initial_total;
+                            $gst_value = $tax_base * $gst;
+                            $total = $initial_total + $gst_value;
+                            break;
+                        
+                        case 3: //Exempt (X)
+                            $total = $initial_total;
+                    }
+
+                    //save to temp
+                    $sql = "INSERT INTO pos_sale_temp (
+                                    product_id,qty,buyer_id,current_price,total,station_id, 
+                                    gst_type_id, gst_code, gst_type, gst_percent, tax_base, gst_value
+                                ) VALUES (
+                                    {$product_id},{$qty},{$buyer_type},{$price},{$total},{$station_id},
+                                    {$gst_type_id}, '{$gst_code}', '{$gst_type}', {$gst_percent}, {$tax_base}, {$gst_value}
+                                );";
+
+                    $save = $mysqli->query($sql);
+                    if ($save) {
+                        //populate
+                        include('query_sale_additem.php');
+
+                        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+                        include('pop_sale_additem.php');
+                    } else {
+                        echo "Error: " . $mysqli->error;
+                    }
+                } else {
+                    echo "Error: Invalid Product Code!";
+                }
+            } else {
+                echo "Error: " . $mysqli->error;
+            }
+        } else {
+            echo "Error: Invalid QTY or Item Code!";
+        }
+
+        break;
+
+    case 2: //pos temp
+        $sql = "SELECT count(*) as count FROM pos_sale_temp WHERE station_id={$station_id};";
+        $exec = $mysqli->query($sql);
+        if ($exec) {
+            $row = $exec->fetch_object();
+            $count = $row->count;
+
+            echo $count;
+        } else {
+            echo "Error: Critical Error Encountered!";
+        }
+        break;
+
+    case 3: //pop temp record
+        include('query_sale_additem.php');
+
+        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+        include('pop_sale_additem.php');
+
+        break;
+
+    case 4: //delete all data from temp db
+        $sql = "DELETE FROM pos_sale_temp WHERE station_id = {$station_id};";
+        $exec = $mysqli->query($sql);
+        if ($exec) {
+            include('query_sale_additem.php');
+
+            $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+            include('pop_sale_additem.php');
+        } else {
+            echo "Error: " . $mysqli->error;
+        }
+
+        break;
+
+    case 5: //delete single item
+        $id = $_POST['id'];
+
+        $sql = "DELETE FROM pos_sale_temp WHERE id={$id};";
+        $exec = $mysqli->query($sql);
+        if ($exec) {
+            include('query_sale_additem.php');
+
+            $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+            include('pop_sale_additem.php');
+        } else {
+            echo "Error: " . $mysqli->error;
+        }
+
+        break;
+
+    case 6: // get item qty
+        $id = $_POST['id'];
+
+        $sql = "SELECT s.qty as qty, u.uom as uom, s.current_price as price, s.total as total,
+                            s.discount_type as discount_type, s.discount_qty as discount_qty, s.discount_total as discount_total,
+                            s.gst_type_id
+                    FROM (pos_sale_temp s
+                    LEFT JOIN (pos_product p LEFT JOIN pos_uom u ON u.id=p.product_uom) ON p.id=s.product_id)
+                    WHERE s.id={$id};";
+        $exec = $mysqli->query($sql);
+        if ($exec) {
+            $row = $exec->fetch_object();
+            // $qty = $row->qty;
+            // $uom = $row->uom;
+
+            // $price = $row->price;
+            // $total = $row->total;
+            // $discount_type = $row->discount_type;
+            // $discount_qty = $row->discount_qty;
+            // $discount_total = $row->discount_total;
+
+            // $gst_type_id = $row->gst_type_id;
+
+            // echo $qty . ":~|~:" . $uom;
+
+            // echo ":~|~:" . $price . ":~|~:" . $total . ":~|~:" . $discount_type . ":~|~:" . $discount_qty . ":~|~:" . $discount_total;
+
+            echo json_encode($row);
+        } else {
+            echo "Error: " . $mysqli->error;
+        }
+
+        break;
+
+    case 7: //update item qty
+        $id = $_POST['id'];
+        $qty = floatval(trim($_POST['qty'] . ''));
+
+        if ($id) {
+            if ($qty > 0) {
+                //compute discount first
+                $sql = "SELECT current_price, discount_type, discount_qty, gst_type_id FROM pos_sale_temp WHERE id={$id};";
+                $exec = $mysqli->query($sql);
+                if ($exec) {
+                    $rows = $exec->fetch_object();
+                    $gst_type_id = intval($rows->gst_type_id);
+                    $current_price = floatval($rows->current_price);
+                    $discount_type = intval($rows->discount_type);
+                    $discount_qty = floatval($rows->discount_qty);
+                    $discount_total = 0;
+
+                    switch ($discount_type) {
+                        case 0:
+                            $discount_total = 0;
+                            break;
+                        case 1: //percentage
+                            $discount_total = ($discount_qty / 100) * ($current_price * $qty);
+                            // $discount_total = ($discount_qty / 100) * ($total);
+                            break;
+                        case 2: //unit price
+                            $discount_total = $discount_qty * $qty;
+                            break;
+                        case 3: //total price
+                            $discount_total = $discount_qty;
+                            break;
+                    }
+
+                    //gst computation 2025-06-01
+                    $gst = floatval($gst_percent/100);
+                    $tax_base = 0;
+                    $gst_value = 0;
+                    $total = 0;
+
+                    $initial_total = ($qty * $current_price) - $discount_total;
+
+                    switch(intval($gst_type_id)){
+                        case 1: //inclusive (I)                            
+                            $divisor = 1 + $gst;
+                            $tax_base = floatval($initial_total) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
+                            $gst_value = $tax_base * $gst;
+                            $total = $initial_total;
+                            break;
+                        
+                        case 2: //exclusive (E)
+                            $tax_base = $initial_total;
+                            $gst_value = $tax_base * $gst;
+                            $total = $initial_total + $gst_value;
+                            break;
+                        
+                        case 3: //Exempt (X)
+                            $total = $initial_total;
+                    }
+
+                    
+
+                    //start updating
+                    $sql = "UPDATE pos_sale_temp s SET
+                                        s.qty={$qty}, s.discount_total={$discount_total},
+                                        s.total={$total}, s.tax_base={$tax_base}, s.gst_value={$gst_value}
+                                WHERE s.id={$id};";
+
+                    $exec = $mysqli->query($sql);
+
+                    if ($exec) {
+                        include('query_sale_additem.php');
+
+                        $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+                        include('pop_sale_additem.php');
+                    } else {
+                        echo "Error: " . $mysqli->error;
+                    }
+                } else {
+                    echo "Error: " . $mysqli->error;
+                }
+            } else {
+                echo "Error: Minimum QTY is 1.0";
+            }
+        } else {
+            echo "Error: Critical Error Encountered!";
+        }
+        break;
+
+    case 8: //update item discount
+        $id = $_POST['id'];
+        $discount_type =  intval($_POST['type']);
+        $discount_qty = floatval($_POST['value']);
+        $discount_total = floatval($_POST['total']);
+        $gst_type_id = intval($_POST['gst_type_id']);
+        $qty = floatval($_POST['qty']);
+        $current_price = floatval($_POST['price']);
+
+        if ($id) {  
+            switch ($discount_type) {
+                case 0:
+                    $discount_total = 0;
+                    break;
+
+                case 1: //percentage
+                    $discount_total = ($discount_qty / 100) * ($current_price * $qty);
+                    // $discount_total = ($discount_qty / 100) * ($total);
+                    break;
+
+                case 2: //unit price
+                    $discount_total = $discount_qty * $qty;
+                    break;
+
+                case 3: //total price
+                    $discount_total = $discount_qty;
+                    break;
+            }
+
+            //gst computation 2025-06-01
+            $gst = floatval($gst_percent/100);
+            $tax_base = 0;
+            $gst_value = 0;
+            $total = 0;
+
+            $initial_total = ($qty * $current_price) - $discount_total;
+
+            switch(intval($gst_type_id)){
+                case 1: //inclusive (I)                            
+                    $divisor = 1 + $gst;
+                    $tax_base = floatval($initial_total) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
+                    $gst_value = $tax_base * $gst;
+                    $total = $initial_total;
+                    break;
+                        
+                case 2: //exclusive (E)
+                    $tax_base = $initial_total;
+                    $gst_value = $tax_base * $gst;
+                    $total = $initial_total + $gst_value;
+                    break;
+                        
+                case 3: //Exempt (X)
+                    $total = $initial_total;
+            }
+
+            $sql = "UPDATE pos_sale_temp s SET
+                                    s.discount_type={$discount_type}, s.discount_qty={$discount_qty}, s.discount_total={$discount_total},
+                                    s.total={$total}, s.tax_base={$tax_base}, s.gst_value={$gst_value}
+                            WHERE s.id={$id};";
+
+            $exec = $mysqli->query($sql);
+            if ($exec) {
+                include('query_sale_additem.php');
+
+                $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+                include('pop_sale_additem.php');
+            } else {
+                echo "Error: " . $mysqli->error;
+            }
+        } else {
+            echo "Error: Critical Error Encountered!";
+        }
+        break;
+
+    // case 9: //save sale
+    //     $subtotal = floatval($_POST['subtotal']);
+    //     $discount = floatval($_POST['discount']);
+    //     $discount_type = intval($_POST['discount_type']);
+    //     $discount_qty = floatval($_POST['discount_qty']);
+    //     $amount_due = floatval($_POST['amount_due']);
+    //     $cash = floatval($_POST['cash']);
+    //     $remarks = $mysqli->real_escape_string(trim($_POST['remarks']));
+    //     $change = $cash - $amount_due;
+    //     $payment_type_id = intval($_POST['payment_type_id']);
+    //     $payment_type_label = $mysqli->real_escape_string(trim($_POST['payment_type_label']));
+    //     $reference = $mysqli->real_escape_string(trim($_POST['reference']));
+
+    //     $receipt_prefix = date('y');
+    //     $receipt_no = $receipt_prefix . '00000000';
+
+    //     $gst = floatval($gst_percent/100);
+    //     $divisor = 1 + $gst;
+    //     $tax_base = floatval($amount_due) / $divisor; //ex: 75total / 1.10 <--this is 110% because we added 10% gst to 100%base price
+	// 	$gst_value = $tax_base * $gst;
+    //     //$gst_value = (floatval($amount_due) * floatval($gst_percent/100));
+
+    //     if ($amount_due > 0.001 && $cash >= $amount_due) {
+    //         //save tran
+    //         $sql = "INSERT INTO pos_transaction (
+    //                                                 dt,subtotal,discount_total,discount_type,discount_qty,
+    //                                                 total,tran_cash,tran_change, payment_type_id,
+    //                                                 `reference`, user_id,remarks, gst_percent, gst_value, tax_base,
+    //                                                 station_id
+    //                                             )
+    //                     VALUES (
+    //                                 '{$dt}',{$subtotal},{$discount},{$discount_type},
+    //                                 {$discount_qty},{$amount_due},{$cash},{$change},
+    //                                 {$payment_type_id}, '{$reference}',{$uid},'{$remarks}',
+    //                                 {$gst_percent}, {$gst_value}, {$tax_base}, {$station_id}
+    //                             );";
+
+    //         $exec = $mysqli->query($sql);
+    //         if ($exec) {
+    //             $tran_id = $mysqli->insert_id;
+    //             //$receipt_no = str_pad($tran_id,10,"0",STR_PAD_LEFT);
+    //             $receipt_no = $receipt_prefix . str_pad($tran_id, 8, "0", STR_PAD_LEFT);
+
+    //             //save to Transaction Trail
+    //             $trail_query = "INSERT INTO pos_trail (dt,module_id,action_id,particular,remarks,user_id)
+    //                                 VALUES ('{$dt}',1,1,'{$receipt_no}','',$uid);";
+    //             $trail_save = $mysqli->query($trail_query);
+    //             //end of Transaction Trail
+
+    //             $sql = "INSERT INTO pos_sale (dt,tran_id,product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,gst_percent,gst_value,tax_base, station_id)
+    //                         SELECT '{$dt}',{$tran_id},product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,{$gst_percent},((total/{$divisor})*{$gst}), (total/{$divisor}), {$station_id}
+    //                         FROM pos_sale_temp
+    //                         WHERE station_id={$station_id};";
+
+    //             $exec = $mysqli->query($sql);
+    //             if ($exec) {
+
+    //                 //save to sold item trail
+    //                 $item_query = "SELECT p.product_code as item_code, p.product_name as item_name
+    //                                    FROM pos_sale s
+    //                                    LEFT JOIN pos_product p ON p.id=s.product_id
+    //                                    WHERE s.tran_id={$tran_id};";;
+    //                 $item_pop = $mysqli->query($item_query);
+    //                 if ($item_pop) {
+    //                     while ($item_row = $item_pop->fetch_object()) {
+    //                         $item_product = $item_row->item_code . ' - ' . $item_row->item_name;
+
+    //                         $trail_query = "INSERT INTO pos_trail (dt,module_id,action_id,particular,remarks,user_id)
+    //                                             VALUES ('{$dt}',6,1,'{$item_product}','',$uid);";
+    //                         $trail_save = $mysqli->query($trail_query);
+    //                     }
+    //                 }
+    //                 //end of sold item trail
+
+    //                 echo $receipt_no . ":~|~:";
+
+    //                 //to be printed on receipt
+    //                 $sql = "SELECT i.qty as qty, i.current_price as price, i.discount_total as discount, i.total as total,
+    //                                     p.product_name as product,
+    //                                     b.type as buyer_type
+    //                             FROM pos_sale_temp i
+    //                             LEFT JOIN pos_product p ON p.id=i.product_id
+    //                             LEFT JOIN pos_buyer b ON b.id=i.buyer_id
+    //                             WHERE i.station_id={$station_id};";
+
+    //                 $pop = $mysqli->query($sql);
+
+    //                 while ($item = $pop->fetch_object()) {
+    //                     $i_product = $item->product;
+    //                     $i_buyer = strtoupper(substr($item->buyer_type . '', 0, 1));
+    //                     $i_qty = $item->qty;
+    //                     $i_price = $item->price;;
+    //                     $i_discount = $item->discount;
+    //                     $i_total = $item->total;
+
+    //                     echo "<tr>";
+    //                     echo "  <td align='left' colspan='4'>{$i_product} ({$i_buyer})</td>";
+    //                     echo "  <td align='right'>{$i_total}</td>";
+    //                     echo "</tr>";
+    //                     echo "<tr>";
+    //                     echo "  <td align='right'>{$i_qty}</td>";
+    //                     echo "  <td align='center'>@</td>";
+    //                     echo "  <td align='left'>{$i_price}</td>";
+    //                     //echo "  <td align='left'>Discount : {$i_discount}</td>";
+    //                     echo "  <td></td>";
+    //                     echo "</tr>";
+    //                 }
+
+    //                 //subtotal
+    //                 echo ":~|~:";
+    //                 echo "<tr>";
+    //                 echo "   <td align='right'>SUBTOTAL</td>";
+    //                 echo "   <td align='right'>" . number_format($subtotal, 2, '.', ',') . "</td>";
+    //                 echo "</tr>";
+    //                 /*
+    //                     echo "<tr>";
+    //                     echo "   <td align='right'>DISCOUNT</td>";
+    //                     echo "   <td align='right'>" . number_format($discount,2,'.',',') . "</td>";
+    //                     echo "</tr>";
+    //                     */
+    //                 echo "<tr>";
+    //                 echo "   <td align='right'><b>AMOUNT DUE</b></td>";
+    //                 echo "   <td align='right'><b>" . number_format($amount_due, 2, '.', ',') . "</b></td>";
+    //                 echo "</tr>";
+    //                 echo "<tr>";
+    //                 echo "   <td align='right'>TENDER</td>";
+    //                 echo "   <td align='right'>" . number_format($cash, 2, '.', ',') . "</td>";
+    //                 echo "</tr>";
+    //                 echo "<tr>";
+    //                 echo "   <td align='right'>CHANGE</td>";
+    //                 echo "   <td align='right'>" . number_format($change, 2, '.', ',') . "</td>";
+    //                 echo "</tr>";
+
+    //                 if ($show_gst){
+    //                     echo "<tr>";
+    //                     echo "  <td></td>";
+    //                     echo "  <td><hr/></td>";
+    //                     echo "</tr>";
+    //                     echo "<tr>";
+    //                     echo "   <td align='right'>TAX BASE</td>";
+    //                     echo "   <td align='right'>" . number_format($tax_base, 2, '.', ',') . "</td>";
+    //                     echo "</tr>";
+    //                     echo "<tr>";
+    //                     echo "   <td align='right'>GST ({$gst_percent} %)</td>";
+    //                     echo "   <td align='right'>" . number_format($gst_value, 2, '.', ',') . "</td>";
+    //                     echo "</tr>";
+    //                 }
+
+    //                 echo "<tr>";
+    //                 echo "   <td align='right'>PMT TYPE</td>";
+    //                 echo "   <td align='right'>" . $payment_type_label . "</td>";
+    //                 echo "</tr>";
+    //                 echo "<tr>";
+    //                 echo "   <td align='right'>PMT REF</td>";
+    //                 echo "   <td align='right'>" . $reference . "</td>";
+    //                 echo "</tr>";
+
+    //                 //empty temp table
+    //                 $sql = "DELETE FROM pos_sale_temp WHERE station_id = {$station_id};";
+    //                 $exec = $mysqli->query($sql);
+
+    //                 echo ":~|~:";
+
+    //                 if ($exec) {
+    //                     include('query_sale_additem.php');
+
+    //                     $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+
+    //                     include('pop_sale_additem.php');
+    //                 } else {
+    //                     echo "Error: " . $mysqli->error;
+    //                 }
+    //             } else {
+    //                 echo "Error: " . $mysqli->error;
+    //             }
+    //         } else {
+    //             echo "Error: " . $mysqli->error;
+    //         }
+    //     } else {
+    //         echo "Error: Invalid Amount Due or Cash is less than the amount due!";
+    //     }
+
+    //     break;
+
+    case 9: //save sale
+        $subtotal = floatval($_POST['subtotal']);
+        $discount = floatval($_POST['discount']);
+        $discount_type = intval($_POST['discount_type']);
+        $discount_qty = floatval($_POST['discount_qty']);
+        $amount_due = floatval($_POST['amount_due']);
+        $cash = floatval($_POST['cash']);
+        $remarks = $mysqli->real_escape_string(trim($_POST['remarks']));
+        $change = $cash - $amount_due;
+        $payment_type_id = intval($_POST['payment_type_id']);
+        $payment_type_label = $mysqli->real_escape_string(trim($_POST['payment_type_label']));
+        $reference = $mysqli->real_escape_string(trim($_POST['reference']));
+
+        $receipt_prefix = date('y');
+        $receipt_no = $receipt_prefix . '00000000';
+
+        // $gst = floatval($gst_percent / 100);
+        // $divisor = 1 + $gst;
+        // $tax_base = floatval($amount_due) / $divisor;
+        // $gst_value = $tax_base * $gst;
+        $total_tax_base = 0;
+        $total_gst_value = 0;
+
+        if ($amount_due > 0.001 && $cash >= $amount_due) {
+
+            try {
+                $mysqli->begin_transaction();
+
+                //get total tax_base and gst_value from pos_sale_temp;
+                $total_sql = "SELECT SUM(tax_base) as tax_base, SUM(gst_value) as gst_value
+                        FROM pos_sale_temp
+                        WHERE station_id={$station_id}
+                        GROUP BY station_id;";
+                
+                $total_pop = $mysqli->query($total_sql);
+                if (!$total_pop) {
+                    throw new Exception($mysqli->error);
+                }
+
+                $total_row = $total_pop->fetch_object();
+                $total_tax_base = $total_row->tax_base;
+                $total_gst_value = $total_row->gst_value;
+                
+
+                $sql = "INSERT INTO pos_transaction (
+                                dt,subtotal,discount_total,discount_type,discount_qty,
+                                total,tran_cash,tran_change, payment_type_id,
+                                `reference`, user_id,remarks, gst_percent, gst_value, tax_base,
+                                station_id
+                            ) VALUES (
+                                '{$dt}',{$subtotal},{$discount},{$discount_type},
+                                {$discount_qty},{$amount_due},{$cash},{$change},
+                                {$payment_type_id}, '{$reference}',{$uid},'{$remarks}',
+                                {$gst_percent}, {$total_gst_value}, {$total_tax_base}, {$station_id}
+                            );";
+
+                if (!$mysqli->query($sql)) {
+                    throw new Exception($mysqli->error);
+                }
+
+                $tran_id = $mysqli->insert_id;
+                $receipt_no = $receipt_prefix . str_pad($tran_id, 8, "0", STR_PAD_LEFT);
+
+                $trail_query = "INSERT INTO pos_trail (dt,module_id,action_id,particular,remarks,user_id)
+                                VALUES ('{$dt}',1,1,'{$receipt_no}','',$uid);";
+                
+                if (!$mysqli->query($trail_query)) {
+                    throw new Exception($mysqli->error);
+                }
+
+                $sql = "INSERT INTO pos_sale (dt,tran_id,product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,gst_percent, gst_value, tax_base, station_id, gst_type_id)
+                        SELECT '{$dt}',{$tran_id},product_id,buyer_id,qty,current_price,discount_type,discount_qty,discount_total,total,gst_percent, gst_value, tax_base, station_id, gst_type_id
+                        FROM pos_sale_temp
+                        WHERE station_id={$station_id};";
+                    
+                if (!$mysqli->query($sql)) {
+                    throw new Exception($mysqli->error);
+                }
+
+                $item_query = "SELECT p.product_code as item_code, p.product_name as item_name
+                                FROM pos_sale s
+                                LEFT JOIN pos_product p ON p.id=s.product_id
+                                WHERE s.tran_id={$tran_id};";
+                $item_pop = $mysqli->query($item_query);
+                    
+                if (!$item_pop) {
+                    throw new Exception($mysqli->error);
+                }
+
+                while ($item_row = $item_pop->fetch_object()) {
+                    $item_product = $item_row->item_code . ' - ' . $item_row->item_name;
+                    $trail_query = "INSERT INTO pos_trail (dt,module_id,action_id,particular,remarks,user_id)
+                                    VALUES ('{$dt}',6,1,'{$item_product}','',$uid);";
+                        
+                    if (!$mysqli->query($trail_query)) {
+                        throw new Exception($mysqli->error);
+                    }
+                }
+
+                // Success so far
+                $sql = "DELETE FROM pos_sale_temp WHERE station_id = {$station_id};";
+                if (!$mysqli->query($sql)) {
+                    throw new Exception($mysqli->error);
+                }
+
+                $mysqli->commit(); // ✅ COMMIT TRANSACTION
+
+                // --- Output Receipt Data ---
+                echo $receipt_no . ":~|~:";
+
+                $sql = "SELECT i.qty as qty, i.current_price as price, i.discount_total as discount, i.total as total, 
+                                i.gst_type_id, i.gst_value, i.tax_base,
+                                p.product_name as product,
+                                b.type as buyer_type,
+                                g.gst_code, g.gst_type
+                        FROM pos_sale i
+                        LEFT JOIN pos_product p ON p.id=i.product_id
+                        LEFT JOIN pos_buyer b ON b.id=i.buyer_id
+                        LEFT JOIN pos_gst_type g ON g.id=i.gst_type_id
+                        WHERE i.tran_id={$tran_id};"; // AND i.station_id={$station_id};";
+                
+                $pop = $mysqli->query($sql);
+
+                while ($item = $pop->fetch_object()) {
+                    $i_product = $item->product;
+                    $i_buyer = strtoupper(substr($item->buyer_type . '', 0, 1));
+                    $i_qty = $item->qty;
+                    $i_price = $item->price;
+                    $i_discount = $item->discount;
+                    $i_total = $item->total;
+
+                    $i_gst_value = $item->gst_value;
+                    $i_gst_type_id = $item->gst_type_id; //1-inclusive; 2-exclusive; 3-exempt
+                    // $i_gst_code = ($i_gst_type_id == 2) ? $i_gst_value :  $item->gst_code;
+                    $i_gst_type = $item->gst_type;
+
+                    //if product gst is not zero rated then show tax base
+                    if (intval($i_gst_type_id) !== 3){
+                        $i_price = $item->tax_base;
+                    }
+                    
+
+                    echo "<tr>
+                            <td align='left' colspan='4'>{$i_product} ({$i_buyer})</td>
+                            <td align='right'>{$i_total}</td>
+                        </tr>";
+
+                    echo "<tr>
+                            <td align='right'>{$i_qty}</td>
+                            <td align='center'>@</td>
+                            <td align='left'>{$i_price}</td>
+                            <!--
+                            <td>GST: {$i_gst_code}</td>
+                            -->
+                            <td>GST: {$i_gst_value}</td>
+                        </tr>";
+                }
+
+                echo ":~|~:";
+                echo "<tr><td align='right'>SUBTOTAL</td><td align='right'>" . number_format($subtotal, 2, '.', ',') . "</td></tr>";
+                echo "<tr><td align='right'><b>AMOUNT DUE</b></td><td align='right'><b>" . number_format($amount_due, 2, '.', ',') . "</b></td></tr>";
+                echo "<tr><td align='right'>TENDER</td><td align='right'>" . number_format($cash, 2, '.', ',') . "</td></tr>";
+                echo "<tr><td align='right'>CHANGE</td><td align='right'>" . number_format($change, 2, '.', ',') . "</td></tr>";
+
+                if ($show_gst) {
+                    echo "<tr><td></td><td><hr/></td></tr>";
+                    echo "<tr><td align='right'>TAX BASE</td><td align='right'>" . number_format($total_tax_base, 2, '.', ',') . "</td></tr>";
+                    echo "<tr><td align='right'>GST ({$gst_percent} %)</td><td align='right'>" . number_format($total_gst_value, 2, '.', ',') . "</td></tr>";
+                }
+
+                echo "<tr><td align='right'>PMT TYPE</td><td align='right'>{$payment_type_label}</td></tr>";
+                echo "<tr><td align='right'>PMT REF</td><td align='right'>{$reference}</td></tr>";
+
+                echo ":~|~:";
+                include('query_sale_additem.php');
+                $sql .= " WHERE t.station_id={$station_id} ORDER BY t.id DESC;";
+                include('pop_sale_additem.php');
+                
+            } catch (Exception $e) {
+                $mysqli->rollback(); // ❌ ROLLBACK on error
+                echo "Transaction failed: " . $e->getMessage();
+            }
+        } else {
+            echo "Error: Invalid Amount Due or Cash is less than the amount due!";
+        }
+        break;
+
+    
+    case 10: //Date and Time
+        echo date('F d, Y H:i:s');
+        break;
+
+    case 11: //Check if Sale module is Lock
+        $sql = "SELECT * FROM pos_sale_lock WHERE date(dt)=date(now()) AND action_id=1;";
+        $pop = $mysqli->query($sql);
+        if ($pop) {
+            $lock = $pop->num_rows;
+            echo $lock;
+        } else {
+            echo "0";
+        }
+
+        break;
+
+    case 12: //lock sale module
+        $action_id = $_POST['action_id'];
+
+        $sql = "INSERT INTO pos_sale_lock (dt,user_id,action_id) VALUES (NOW(),{$uid},{$action_id});";
+        $save = $mysqli->query($sql);
+        if ($save) {
+        } else {
+            echo "Error: " . $mysqli->error;
+        }
+
+        break;
+
+    default:
+        echo "Error: Critical Error Encountered!";
+}
+
+$mysqli->close();

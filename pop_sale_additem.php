@@ -1,9 +1,12 @@
 <?php
-$pop = $mysqli->query($sql);
+    $pop = $mysqli->query($sql);
                             if ($pop){
                                 $count = $pop->num_rows;
                                 $all_total = 0.00;
                                 $total = 0.00;
+
+                                $all_tax_base = 0.00;
+                                $all_gst_value = 0.00;
                                 
                                 if ($count > 0){
                                     
@@ -19,6 +22,19 @@ $pop = $mysqli->query($sql);
                                         $discount_type = "None";
                                         $discount_qty = number_format(floatval("0.00"),2,'.',',');
                                         $discount_total = number_format(floatval("0.00"),2,'.',',');
+
+                                        $gst_type_id = $rows->gst_type_id;
+                                        $gst_value = $rows->gst_value;
+                                        // $gst_code = ($rows->gst_code == "E") ? $gst_value : $rows->gst_code;
+                                        $gst_type = $rows->gst_type;
+                                        // $gst_percent = $rows->gst_percent;
+                                        // $taxbase = $rows->tax_base;
+
+                                        //if product gst is not zero rated then show tax base
+                                        if (intval($gst_type_id) !== 3){
+                                            $current_price = $rows->tax_base;
+                                        }
+                                        
                                         
                                         if ($discount_type_id > 0) {
                                             $discount_type = $rows->discount_type;
@@ -44,6 +60,8 @@ $pop = $mysqli->query($sql);
                                         echo "  <td align='center'>{$buyer_type}</td>";
                                         echo "  <td align='right'>{$current_price}</td>";
                                         echo "  <td align='right'><a href='#' id='{$id}' class='btn_sale_itemdiscount' title='TYPE: {$discount_type} <br />VALUE: {$discount_qty} <br />TOTAL: {$discount_total} <br /><br />Click to update the value.' data-toggle='tooltip'>{$discount_total}</a></td>";
+                                        // echo "  <td align='center'><span title='TYPE: {$gst_type}' data-toggle='tooltip'>{$gst_code}</span></td>";
+                                        echo "  <td align='center'><span title='TYPE: {$gst_type}' data-toggle='tooltip'>{$gst_value}</span></td>";
                                         echo "  <td align='right'>{$item_total}</td>";
                                         echo "</tr>";                                        
                                     }
@@ -53,7 +71,7 @@ $pop = $mysqli->query($sql);
                                     echo ":~|~:" . $total;
                                     
                                 }else{
-                                    echo "<tr><td colspan='7' align='center'>No Product to Purchase Yet</td></tr>";
+                                    echo "<tr><td colspan='8' align='center'>No Product to Purchase Yet</td></tr>";
                                     
                                     echo ":~|~:" . number_format($all_total,2,'.',',');
                                     echo ":~|~:" . $all_total; //without comman seperated
